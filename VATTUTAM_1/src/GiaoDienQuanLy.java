@@ -204,6 +204,8 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         } else if (e.getSource() == lb03) {
             tbp01.setSelectedIndex(2);
         } else if (e.getSource() == lb031) {
+            JPanelThongKe.setSoLuongVT(JPanelVatTu.getSoLuongVatTu());
+            JPanelThongKe.setSoLuongNV(JPanelNhanVien.getSoLuongNhanVien());
             tbp01.setSelectedIndex(3);
         }
     }

@@ -39,6 +39,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
     private int rowSelected = -1;
     private static JLabel lbthongbao;
     private static boolean danglapHD_NV = false;
+    private static int soLuongNhanVien=0;
 
     public JPanelNhanVien() {
         this.setBackground(new Color(255, 255, 255));
@@ -167,7 +168,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         model = new DefaultTableModel(dataJT, columnJT);
         tbnhanvien = new JTable(model);
         Connection con = ConnectSQL.getCon();
-        String sql = "SELECT * FROM NHANVIEN";
+        String sql = "SELECT * FROM NHANVIEN ORDER BY TENNV,HONV";
         try {
             PreparedStatement pre = con.prepareStatement(sql);
             ResultSet rs = pre.executeQuery();
@@ -176,6 +177,8 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
                 model.addRow(new Object[]{stt, rs.getInt("MaNV"), rs.getString("HoNV"), rs.getString("TenNV"), rs.getString("Phai")});
                 stt ++;
             }
+            soLuongNhanVien+=stt-1;
+            pre.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -268,7 +271,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
     public static void updateList(){
         model.setRowCount(0);
         Connection con = ConnectSQL.getCon();
-        String sql = "SELECT * FROM NHANVIEN";
+        String sql = "SELECT * FROM NHANVIEN ORDER BY TENNV,HONV";
         try {
             PreparedStatement pre = con.prepareStatement(sql);
             ResultSet rs = pre.executeQuery();
@@ -277,6 +280,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
                 model.addRow(new Object[]{stt, rs.getInt("MaNV"), rs.getString("HoNV"), rs.getString("TenNV"), rs.getString("Phai")});
                 stt ++;
             }
+            pre.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -290,6 +294,8 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
             String maNVC = ChuanHoa.ChuanHoa(txtmanv.getText());
             String hoNVC = ChuanHoa.ChuanHoa(txthonv.getText());
             String tenNVC = ChuanHoa.ChuanHoa(txttennv.getText());
+            /// can phai kiem tra tai khoan dang nhap
+            //
             if (maNVC.equals("") || hoNVC.equals("") || tenNVC.equals("")) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin nhân viên!");
                 return;
@@ -307,20 +313,22 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
             String sql = "INSERT INTO NHANVIEN VALUES (?, ?, ?, ?)";
             try {
                 PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                pre.setInt(1, Integer.parseInt(txtmanv.getText()));
-                pre.setString(2, txthonv.getText());
-                pre.setString(3, txttennv.getText());
+                pre.setInt(1, Integer.parseInt(maNVC));
+                pre.setString(2, hoNVC);
+                pre.setString(3, tenNVC);
                 String Sgioitinh = null;
                 if(gioiTinh == 1) Sgioitinh = "Nam";
                 else if(gioiTinh == 0) Sgioitinh = "Nữ";
                 pre.setString(4, Sgioitinh);
                 pre.executeUpdate();
+                pre.close();
                 model.addRow(new Object[]{tbnhanvien.getRowCount() + 1,Integer.parseInt(maNVC), hoNVC, tenNVC, Sgioitinh});
                 JPanelHoaDon.getModelNhanVien().addRow(new Object[]{Integer.parseInt(maNVC), hoNVC, tenNVC, Sgioitinh});
                 txttennv.setText(tenNVC);
                 txthonv.setText(hoNVC);
                 updateList();
                 JOptionPane.showMessageDialog(null, "Thêm nhân viên thành công");
+                soLuongNhanVien+=1;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, "Mã nhân viên đã tồn tại");
             }
@@ -345,7 +353,22 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một nhân viên để xóa");
                 return;
             }
-
+            String query = "SELECT MANV FROM CTHOADON WHERE MANV = " + maNVValueSelected + " GROUP BY MANV";
+            try {
+                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
+                ResultSet rs = pre.executeQuery();
+                int dem = 0;
+                while (rs.next()) {
+                    dem ++;
+                }
+                if (dem>0){
+                    JOptionPane.showMessageDialog(null,"Nhân viên đã từng lập hóa đơn nên không thể xóa!");
+                    return;
+                }
+                pre.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             if(danglapHD_NV == true){
                 JOptionPane.showMessageDialog(null, "Vui lòng hoàn thành hóa đơn trước " +
                         "đó sau đó quay lại xóa nhân viên");
@@ -355,12 +378,14 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
             int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa nhân viên: " + maNVValueSelected);
             if (choose == 0) {
                 String sql = "DELETE FROM NHANVIEN WHERE " + "MANV = " + maNVValueSelected;
-                System.out.println("Sql = " + sql);
+                //System.out.println("Sql = " + sql);
                 try {
                     Statement stmt = ConnectSQL.getCon().createStatement();
                     stmt.executeUpdate(sql);
+                    stmt.close();
                     updateList();
                     JOptionPane.showMessageDialog(null, "Xóa nhân viên thành công");
+                    soLuongNhanVien-=1;
                     maNVValueSelected = null;
                     JPanelHoaDon.setNhanVienValueSelected(null);
                     JPanelHoaDon.setManvchoosed("NULL");
@@ -491,4 +516,8 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         maNVValueSelected = null;
         updateList();
     }
+    public static int getSoLuongNhanVien(){
+        return soLuongNhanVien;
+    }
 }
+

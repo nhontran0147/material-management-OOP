@@ -33,6 +33,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
     private int rowSelected = -1;
     private static JLabel lbthongbao;
     private static boolean danglapHD_VT = false;
+    private static int soLuongVatTu=0;
 
     public JPanelVatTu() {
         this.setBackground(new Color(255, 255, 255));
@@ -97,7 +98,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         model = new DefaultTableModel(dataJT, columnJT);
         tbvattu = new JTable(model);
 
-        String sql = "SELECT * FROM VATTU";
+        String sql = "SELECT * FROM VATTU ORDER BY TENVT,MAVT";
         try {
             PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
             ResultSet rs = pre.executeQuery();
@@ -106,6 +107,8 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                 model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
                 stt ++;
             }
+            soLuongVatTu=stt-1;
+            pre.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -147,7 +150,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         tbvattu.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 if (tbvattu.getSelectedRow() > -1) {
-                    System.out.println(tbvattu.getValueAt(tbvattu.getSelectedRow(), 1).toString());
+                    //System.out.println(tbvattu.getValueAt(tbvattu.getSelectedRow(), 1).toString());
                     maVTValueSelected = tbvattu.getValueAt(tbvattu.getSelectedRow(), 1).toString();
                     tenVTValueSelected = tbvattu.getValueAt(tbvattu.getSelectedRow(), 2).toString();
                     soLuongSelected = tbvattu.getValueAt(tbvattu.getSelectedRow(), 3).toString();
@@ -248,7 +251,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
     }
 
-    public String ChuanHoa(String s) {
+    public static String ChuanHoa(String s) {
         s = s.trim();
         for (int i = 0; i < s.length() - 1; i++) {
             if (s.charAt(i) == ' ' && s.charAt(i + 1) == ' ') {
@@ -264,7 +267,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
     public static void upDateList() {
         model.setRowCount(0);
-        String sql = "SELECT * FROM VATTU";
+        String sql = "SELECT * FROM VATTU ORDER BY TENVT,MAVT";
         try {
             PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
             ResultSet rs = pre.executeQuery();
@@ -273,6 +276,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                 model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
                 stt ++;
             }
+            pre.close();
             System.out.println("LOAD THÀNH CÔNG VẬT TƯ");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -308,12 +312,13 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                     txttenvt.getText(), Integer.parseInt(txtsoluongton.getText()), txtdonvi.getText()});
             JPanelHoaDon.getModelVatTu().addRow(new Object[]{Integer.parseInt(txtmavt.getText()),
                     txttenvt.getText(), Integer.parseInt(txtsoluongton.getText()), txtdonvi.getText()});
-
+            upDateList();
             JOptionPane.showMessageDialog(null, "Thêm vật tư thành công");
+            soLuongVatTu+=1;
+            pre.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Mã vật tư đã tồn tại");
         }
-
     }
 
     @Override
@@ -332,8 +337,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         }
 
         if (e.getSource() == txttenvt) {
-            System.out.println("---");
-            System.out.println(e.getKeyCode());
             if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
                     || (e.getKeyChar()>='0' && e.getKeyChar()<='9' && txttenvt.getText().length()>0) || e.getKeyCode()==32  || e.getKeyCode() == 16) && txttenvt.getText().length()<45) || e.getKeyCode()==8 || e.getKeyCode() ==127  ){
                 txttenvt.setEditable(true);
@@ -373,7 +376,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
         }
         if (e.getSource() == btneditVT) {
-            System.out.println("Chỉnh sửa vật tư: " + maVTValueSelected);
+            //System.out.println("Chỉnh sửa vật tư: " + maVTValueSelected);
             if(maVTValueSelected == null){
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một vật tư để chỉnh sửa");
             }
@@ -399,6 +402,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                     model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
                     stt ++;
                 }
+                pre.close();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -412,10 +416,27 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
 
         if (e.getSource() == btnremoveVT) {
-            System.out.println("Xóa Vật Tư: " + maVTValueSelected);
+//            System.out.println("Xóa Vật Tư: " + maVTValueSelected);
             if (maVTValueSelected == null) {
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một vật tư để xóa");
                 return;
+            }
+            String query = "SELECT MaVT FROM CTHOADON WHERE MAVT ="+ maVTValueSelected + " GROUP BY MaVT";
+            try {
+                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
+                ResultSet rs = pre.executeQuery();
+                int dem = 0;
+                while (rs.next()) {
+                    dem ++;
+                }
+                if (dem>0){
+                    JOptionPane.showMessageDialog(null,"Vật tư đã tồn tại trong hóa đơn được lập trước đó nên không thể xóa!");
+                    pre.close();
+                    return;
+                }
+                pre.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
             if(danglapHD_VT == true){
                 JOptionPane.showMessageDialog(null, "Vui lòng hoàn thành hóa đơn trước " +
@@ -425,12 +446,14 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
             int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa vật tư: " + maVTValueSelected);
             if (choose == 0) {
                 String sql = "DELETE FROM VATTU WHERE " + "MAVT = " + maVTValueSelected;
-                System.out.println("Sql = " + sql);
+//                System.out.println("Sql = " + sql);
                 try {
-                    Statement stmt = ConnectSQL.getCon().createStatement();
-                    stmt.executeUpdate(sql);
+                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
+                    pre.executeUpdate();
                     upDateList();
+                    pre.close();
                     JOptionPane.showMessageDialog(null, "Xóa vật tư thành công");
+                    soLuongVatTu-=1;
                     maVTValueSelected = null;
                     JPanelHoaDon.setVatTuNameSelected(null);
                     JPanelHoaDon.setVatTuValueSelected(null);
@@ -513,6 +536,9 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         lbthongbao.setText("Bạn chưa chọn vật tư nào");
         maVTValueSelected = null;
         upDateList();
+    }
+    public static int getSoLuongVatTu(){
+        return soLuongVatTu;
     }
 
 }

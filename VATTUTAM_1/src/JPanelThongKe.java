@@ -18,9 +18,9 @@ public class JPanelThongKe extends JPanel implements ActionListener {
     private JPanel boxNhanVien;
     private JPanel boxHoaDon;
     private JLabel lbTKVatTu;
-    private JLabel lbSLVatTu;
+    private static JLabel lbSLVatTu;
     private JLabel lbTKNhanVien;
-    private JLabel lbSLNhanVien;
+    private static JLabel lbSLNhanVien;
     private JLabel lbTKHoaDon;
     private JLabel lbSLHoaDon;
 
@@ -59,7 +59,8 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKVatTu.setBounds(0, 10, 150, 100);
 
         lbSLVatTu = new JLabel();
-        lbSLVatTu.setText("20");
+        String slVatTu = String.valueOf(JPanelVatTu.getSoLuongVatTu());
+        lbSLVatTu.setText(slVatTu);
         lbSLVatTu.setFont(new Font("Ubuntu", Font.BOLD, 25));
         lbSLVatTu.setBounds(180, 20, 60, 100);
 
@@ -84,7 +85,8 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKNhanVien.setBounds(0, 10, 150, 100);
 
         lbSLNhanVien = new JLabel();
-        lbSLNhanVien.setText("50");
+        String slNhanVien = String.valueOf(JPanelNhanVien.getSoLuongNhanVien());
+        lbSLNhanVien.setText(slNhanVien);
         lbSLNhanVien.setFont(new Font("Ubuntu", Font.BOLD, 25));
         lbSLNhanVien.setBounds(180, 20, 60, 100);
 
@@ -377,5 +379,13 @@ public class JPanelThongKe extends JPanel implements ActionListener {
                 }
             }
         }
+    }
+    public static void setSoLuongVT(int soLuong){
+        String slVatTu = String.valueOf(soLuong);
+        lbSLVatTu.setText(slVatTu);
+    }
+    public static void setSoLuongNV(int soLuong){
+        String slNhanVien = String.valueOf(JPanelNhanVien.getSoLuongNhanVien());
+        lbSLNhanVien.setText(slNhanVien);
     }
 }

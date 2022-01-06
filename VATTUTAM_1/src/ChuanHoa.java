@@ -3,26 +3,8 @@ import java.util.Locale;
 
 public class ChuanHoa {
     public static void main(String[] args) {
-        String s = "xin chào bạn nhé KAKAKA fC  ";
-        s = s.trim();
-        System.out.println("s =" + s);
-        String[] Arr = s.split("");
-        if (s.length() > 0) {
-            s = Arr[0].toUpperCase();
-        }
-
-        for (int i = 1; i < Arr.length - 1; i++) {
-            if (Arr[i - 1].equals(" ")) {
-                System.out.println("HAHA");
-                s += Arr[i].toUpperCase();
-            } else {
-                System.out.println("HAHA");
-                s += Arr[i];
-            }
-        }
-        s += Arr[Arr.length - 1];
-
-        System.out.println("s = " + s);
+        String s = "   z  ";
+        System.out.println(ChuanHoa(s));
     }
 
     public static String ChuanHoa(String s) {
@@ -33,23 +15,17 @@ public class ChuanHoa {
                 i--;
             }
         }
-
+        s=s.toLowerCase();
         String Arr[] = s.split("");
-        if (s.length() > 0) {
-            s = Arr[0].toUpperCase();
-        }
-
-        for (int i = 1; i < Arr.length - 1; i++) {
+        String stringRes=Arr[0].toUpperCase();
+        for (int i = 1; i < Arr.length; i++) {
             if (Arr[i - 1].equals(" ")) {
-                System.out.println("HAHA");
-                s += Arr[i].toUpperCase();
+                stringRes += Arr[i].toUpperCase();
             } else {
-                System.out.println("HAHA");
-                s += Arr[i];
+                stringRes += Arr[i];
             }
         }
-        s += Arr[Arr.length - 1];
-        return s;
+        return stringRes;
     }
 
     public static String ChuyenSoThanhTien(String s){

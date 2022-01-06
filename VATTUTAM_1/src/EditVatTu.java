@@ -131,9 +131,11 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
 
 
         txtTenVatTu.setText(TenVT);
+        txtTenVatTu.addKeyListener(this);
         txtMaVatTu.setText(MaVT);
         txtSoLuongTon.setText(SoLuongTon);
         txtDonViTinh.setText(DonViTinh);
+        txtDonViTinh.addKeyListener(this);
         txtMaVatTu.setEditable(false);
         txtSoLuongTon.setEditable(false);
 
@@ -147,10 +149,16 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (txtTenVatTu.getText().equals("") && txtDonViTinh.getText().equals("")) {
+        txtTenVatTu.setText(JPanelVatTu.ChuanHoa(txtTenVatTu.getText()));
+        txtDonViTinh.setText(JPanelVatTu.ChuanHoa(txtDonViTinh.getText()));
+        if (txtTenVatTu.getText().equals("") || txtDonViTinh.getText().equals("")) {
             JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin");
-        } else{
-            int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sữa");
+        } else if ((txtTenVatTu.getText().charAt(0)>='0' && txtTenVatTu.getText().charAt(0) <= '9') ||
+                (txtDonViTinh.getText().charAt(0) >= '0' && txtDonViTinh.getText().charAt(0) <= '9')){
+            JOptionPane.showMessageDialog(null,"Tên vật tư và đơn vị tính không được bắt đầu bằng số !");
+        }else
+        {
+            int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sửa?");
             if(result == 0){
                 try {
                     Statement stmt = con.createStatement();
@@ -158,6 +166,7 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
                             "SET TenVT = N'"+txtTenVatTu.getText()+ "', DONVITINH = N'"+txtDonViTinh.getText()+
                             "' WHERE MAVT = "+Integer.parseInt(txtMaVatTu.getText());
                     stmt.executeUpdate(sql);
+                    stmt.close();
                     JPanelVatTu.upDateList();
                     JPanelHoaDon.upDateListVatTu();
                     JPanelVatTu.setMaVTValueSelected(null);
@@ -183,7 +192,20 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getSource() == txtTenVatTu) {
+            if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
+                    || (e.getKeyChar()>='0' && e.getKeyChar()<='9' && txtTenVatTu.getText().length()>0) || e.getKeyCode()==32  || e.getKeyCode() == 16) && txtTenVatTu.getText().length()<45) || e.getKeyCode()==8 || e.getKeyCode() ==127  ){
+                txtTenVatTu.setEditable(true);
+            }else txtTenVatTu.setEditable(false);
+        }
 
+        if (e.getSource() == txtDonViTinh){
+            if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
+                    || (e.getKeyChar()>='0' && e.getKeyChar()<='9' && txtDonViTinh.getText().length()>0 ) || e.getKeyCode()==32  || e.getKeyCode() == 16) && txtDonViTinh.getText().length()<45) || e.getKeyCode()==8 || e.getKeyCode() ==127  ){
+                txtDonViTinh.setEditable(true);
+            }
+            else txtDonViTinh.setEditable(false);
+        }
     }
 
     @Override

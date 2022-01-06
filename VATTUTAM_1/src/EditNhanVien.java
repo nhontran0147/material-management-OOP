@@ -99,6 +99,7 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
         txtHoNhanVien.setForeground(new Color(214, 215, 217));
         txtHoNhanVien.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         txtHoNhanVien.setFont(new Font("Arial", Font.BOLD, 15));
+        txtHoNhanVien.addKeyListener(this);
         JPmain.add(txtHoNhanVien);
 
         txtTenNhanVien = new JTextField();
@@ -107,6 +108,7 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
         txtTenNhanVien.setForeground(new Color(214, 215, 217));
         txtTenNhanVien.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         txtTenNhanVien.setFont(new Font("Arial", Font.BOLD, 15));
+        txtTenNhanVien.addKeyListener(this);
         JPmain.add(txtTenNhanVien);
 
 //        txtPhaiNhanVien = new JTextField();
@@ -176,10 +178,19 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnEdit){
+            txtHoNhanVien.setText(ChuanHoa.ChuanHoa(txtHoNhanVien.getText()));
+            txtTenNhanVien.setText(ChuanHoa.ChuanHoa(txtTenNhanVien.getText()));
             if (txtHoNhanVien.getText().equals("") && txtPhaiNhanVien.equals("")) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin");
-            } else{
-                int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sữa");
+                return;
+            }
+            for (int i=0;i<txtTenNhanVien.getText().length();++i){
+                if (txtTenNhanVien.getText().charAt(i)==' '){
+                    JOptionPane.showMessageDialog(null,"Tên nhân viên chỉ nhận một chữ, vui lòng nhập lại!");
+                    return;
+                }
+            }
+            int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sữa");
                 if(result == 0){
                     try {
                         Statement stmt = con.createStatement();
@@ -187,8 +198,9 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
                                 "SET TenNV = N'"+ txtTenNhanVien.getText()+ "', Phai = N'"+ txtPhaiNhanVien+"', "+
                                 "HONV = N'"+ txtHoNhanVien.getText()+
                                 "' WHERE MANV = "+Integer.parseInt(txtMaNhanVien.getText());
-                        System.out.println("SQLLLL ="+ sql);
+                        //System.out.println("SQLLLL ="+ sql);
                         stmt.executeUpdate(sql);
+                        stmt.close();
                         JPanelNhanVien.setMaNVValueSelected(null);
                         JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thành công");
                         JPanelNhanVien.updateList();
@@ -202,8 +214,6 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
                         JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thất bại");
                     }
                 }
-
-            };
         }
         if(e.getSource() == JBTPhaiNam){
             JBTPhaiNam.setBackground(new Color(42, 185, 48));
@@ -224,7 +234,18 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getSource() == txtTenNhanVien)  //can fix them
+            if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
+                    || e.getKeyCode() == 32 || e.getKeyCode() == 16) && txtTenNhanVien.getText().length() < 45) || e.getKeyCode() == 8 || e.getKeyCode() == 127) {
+                txtTenNhanVien.setEditable(true);
+            } else txtTenNhanVien.setEditable(false);
 
+        if (e.getSource() == txtHoNhanVien) {
+            if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
+                    || e.getKeyCode() == 32 || e.getKeyCode() == 16) && txtHoNhanVien.getText().length() < 45) || e.getKeyCode() == 8 || e.getKeyCode() == 127) {
+                txtHoNhanVien.setEditable(true);
+            } else txtHoNhanVien.setEditable(false);
+        }
     }
 
     @Override
