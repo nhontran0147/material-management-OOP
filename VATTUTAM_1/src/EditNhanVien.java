@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,7 +25,9 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
 
     private JLabel JLBHappy;
     private Connection con;
+    private static boolean checkEditNhanVien=false;
     public EditNhanVien(String MaNV, String HoNV, String TenNV, String Phai) {
+        checkEditNhanVien= true;
         System.out.println("EDIT MÃ NHÂN VIÊN: " + MaNV);
         this.setTitle("CHỈNH SỬA NHÂN VIÊN");
         this.setSize(WIDTH_EDIT, HEIGHT_EDIT);
@@ -111,15 +110,6 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
         txtTenNhanVien.addKeyListener(this);
         JPmain.add(txtTenNhanVien);
 
-//        txtPhaiNhanVien = new JTextField();
-//        txtPhaiNhanVien.setBounds(190, 260, 220, 40); // 160
-//        txtPhaiNhanVien.setBackground(new Color(66, 66, 66));
-//        txtPhaiNhanVien.setForeground(new Color(214, 215, 217));
-//        txtPhaiNhanVien.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-//        txtPhaiNhanVien.setFont(new Font("Arial", Font.BOLD, 15));
-//        txtPhaiNhanVien.setForeground(Color.RED);
-//        JPmain.add(txtPhaiNhanVien);
-
         JBTPhaiNam = new JButton("NAM");
         JBTPhaiNam.addActionListener(this);
         JBTPhaiNam.setBounds(190, 260, 100, 40); // 160
@@ -154,6 +144,11 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
         JLBHappy.setHorizontalAlignment(SwingConstants.CENTER);
         JPmain.add(JLBHappy);
 
+        this.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                checkEditNhanVien = false;
+            }
+        });
 
         txtHoNhanVien.setText(HoNV);
         txtMaNhanVien.setText(MaNV);
@@ -192,27 +187,9 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
             }
             int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sữa");
                 if(result == 0){
-                    try {
-                        Statement stmt = con.createStatement();
-                        String sql = "UPDATE NHANVIEN " +
-                                "SET TenNV = N'"+ txtTenNhanVien.getText()+ "', Phai = N'"+ txtPhaiNhanVien+"', "+
-                                "HONV = N'"+ txtHoNhanVien.getText()+
-                                "' WHERE MANV = "+Integer.parseInt(txtMaNhanVien.getText());
-                        //System.out.println("SQLLLL ="+ sql);
-                        stmt.executeUpdate(sql);
-                        stmt.close();
-                        JPanelNhanVien.setMaNVValueSelected(null);
-                        JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thành công");
-                        JPanelNhanVien.updateList();
-                        JPanelHoaDon.upDateListNhanVien();
-                        JPanelNhanVien.setThongBao("Bạn chưa chọn nhân viên nào");
-                        JPanelHoaDon.setNhanVienValueSelected(null);
-                        JPanelHoaDon.setManvchoosed("NULL");
-                        this.dispose();
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thất bại");
-                    }
+                    checkEditNhanVien = false;
+                    GiaoDienQuanLy.changeNhanVien(txtMaNhanVien.getText(),txtHoNhanVien.getText(),txtTenNhanVien.getText(),txtPhaiNhanVien);
+                    this.dispose();
                 }
         }
         if(e.getSource() == JBTPhaiNam){
@@ -251,6 +228,9 @@ public class EditNhanVien extends JFrame implements ActionListener, KeyListener 
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+    public static boolean getCheckEditNhanVien(){
+        return checkEditNhanVien;
     }
 }
 

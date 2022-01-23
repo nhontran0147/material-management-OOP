@@ -161,28 +161,12 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btnresetNV.setIconTextGap(10);
 
 
-        String[] columnJT = {"STT", "MANV", "HONV", "TENNV", "PHAI"};
+        String[] columnJT = {"STT", "MANV", "HONV", "TENNV", "PHAI", "TRANG THAI"};
         String[][] dataJT = {};
-
-
         model = new DefaultTableModel(dataJT, columnJT);
         tbnhanvien = new JTable(model);
-        Connection con = ConnectSQL.getCon();
-        String sql = "SELECT * FROM NHANVIEN ORDER BY TENNV,HONV";
-        try {
-            PreparedStatement pre = con.prepareStatement(sql);
-            ResultSet rs = pre.executeQuery();
-            int stt = 1;
-            while (rs.next()) {
-                model.addRow(new Object[]{stt, rs.getInt("MaNV"), rs.getString("HoNV"), rs.getString("TenNV"), rs.getString("Phai")});
-                stt ++;
-            }
-            soLuongNhanVien+=stt-1;
-            pre.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
+        GiaoDienQuanLy.changeModelNhanVien(model);
 
         tbnhanvien.setFillsViewportHeight(true);
         tbnhanvien.setOpaque(true);
@@ -197,6 +181,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         tbnhanvien.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
         tbnhanvien.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         tbnhanvien.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+        tbnhanvien.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
         tbnhanvien.setRowHeight(30);
         tbnhanvien.getTableHeader().setFont(new Font("SansSerif", Font.PLAIN, 16)); // Set font Header
         tbnhanvien.getTableHeader().setPreferredSize(new Dimension(100, 40)); // Set height
@@ -270,27 +255,17 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
 
     public static void updateList(){
         model.setRowCount(0);
-        Connection con = ConnectSQL.getCon();
-        String sql = "SELECT * FROM NHANVIEN ORDER BY TENNV,HONV";
-        try {
-            PreparedStatement pre = con.prepareStatement(sql);
-            ResultSet rs = pre.executeQuery();
-            int stt = 1;
-            while (rs.next()) {
-                model.addRow(new Object[]{stt, rs.getInt("MaNV"), rs.getString("HoNV"), rs.getString("TenNV"), rs.getString("Phai")});
-                stt ++;
-            }
-            pre.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        GiaoDienQuanLy.changeModelNhanVien(model);
     }
-
 
     @Override
     public void mouseClicked(MouseEvent e) {
 
         if(e.getSource() == btnaddNV){
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền thêm nhân viên!");
+                return;
+            }
             String maNVC = ChuanHoa.ChuanHoa(txtmanv.getText());
             String hoNVC = ChuanHoa.ChuanHoa(txthonv.getText());
             String tenNVC = ChuanHoa.ChuanHoa(txttennv.getText());
@@ -310,31 +285,26 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn giới tính!");
                 return;
             }
-            String sql = "INSERT INTO NHANVIEN VALUES (?, ?, ?, ?)";
-            try {
-                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                pre.setInt(1, Integer.parseInt(maNVC));
-                pre.setString(2, hoNVC);
-                pre.setString(3, tenNVC);
-                String Sgioitinh = null;
-                if(gioiTinh == 1) Sgioitinh = "Nam";
-                else if(gioiTinh == 0) Sgioitinh = "Nữ";
-                pre.setString(4, Sgioitinh);
-                pre.executeUpdate();
-                pre.close();
-                model.addRow(new Object[]{tbnhanvien.getRowCount() + 1,Integer.parseInt(maNVC), hoNVC, tenNVC, Sgioitinh});
-                JPanelHoaDon.getModelNhanVien().addRow(new Object[]{Integer.parseInt(maNVC), hoNVC, tenNVC, Sgioitinh});
-                txttennv.setText(tenNVC);
-                txthonv.setText(hoNVC);
-                updateList();
-                JOptionPane.showMessageDialog(null, "Thêm nhân viên thành công");
-                soLuongNhanVien+=1;
-            } catch (SQLException ex) {
+            if (GiaoDienQuanLy.isTonTaiNhanVien(maNVC)){
                 JOptionPane.showMessageDialog(null, "Mã nhân viên đã tồn tại");
+            }else{
+                int choose = JOptionPane.showConfirmDialog(null,"Bạn có chắc lưu thông tin vào database?");
+                if (choose==0){
+                    String gtNVC= (gioiTinh==1 ? "Nam":"Nữ");
+                    GiaoDienQuanLy.addNhanVien(maNVC,hoNVC,tenNVC,gtNVC);
+                    updateList();
+                    txthonv.setText(hoNVC);
+                    txttennv.setText(tenNVC);
+                    JOptionPane.showMessageDialog(null, "Thêm nhân viên thành công");
+                }
             }
         }
 
         if(e.getSource() == btneditNV){
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền sửa thông tin nhân viên!");
+                return;
+            }
             if(maNVValueSelected == null){
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một nhân viên để chỉnh sửa");
             }
@@ -344,62 +314,46 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
                             "đó sau đó quay lại chỉnh sửa nhân viên");
                     return;
                 }
-                new EditNhanVien(maNVValueSelected, hoNVValueSelected, tenNValueSelected, phaiSelected);
+                if (!EditNhanVien.getCheckEditNhanVien())
+                    new EditNhanVien(maNVValueSelected, hoNVValueSelected, tenNValueSelected, phaiSelected);
             }
         }
 
         if(e.getSource() == btnremoveNV){
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền xóa nhân viên!");
+                return;
+            }
             if(maNVValueSelected == null){
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một nhân viên để xóa");
                 return;
-            }
-            String query = "SELECT MANV FROM CTHOADON WHERE MANV = " + maNVValueSelected + " GROUP BY MANV";
-            try {
-                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
-                ResultSet rs = pre.executeQuery();
-                int dem = 0;
-                while (rs.next()) {
-                    dem ++;
-                }
-                if (dem>0){
-                    JOptionPane.showMessageDialog(null,"Nhân viên đã từng lập hóa đơn nên không thể xóa!");
-                    return;
-                }
-                pre.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
             }
             if(danglapHD_NV == true){
                 JOptionPane.showMessageDialog(null, "Vui lòng hoàn thành hóa đơn trước " +
                         "đó sau đó quay lại xóa nhân viên");
                 return;
             }
-
-            int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa nhân viên: " + maNVValueSelected);
-            if (choose == 0) {
-                String sql = "DELETE FROM NHANVIEN WHERE " + "MANV = " + maNVValueSelected;
-                //System.out.println("Sql = " + sql);
-                try {
-                    Statement stmt = ConnectSQL.getCon().createStatement();
-                    stmt.executeUpdate(sql);
-                    stmt.close();
+            if (GiaoDienQuanLy.isNhanVienDaLapHoaDon(maNVValueSelected))
+            {
+                int choose = JOptionPane.showConfirmDialog(null, "Nhân viên này đã lập một số hóa đơn nên không thể xóa vĩnh viễn, bạn có muốn chuyển trạng thái nhân viên này?");
+                if (choose==0){
+                    GiaoDienQuanLy.changeTrangThaiNhanVien(maNVValueSelected,false);
                     updateList();
-                    JOptionPane.showMessageDialog(null, "Xóa nhân viên thành công");
-                    soLuongNhanVien-=1;
-                    maNVValueSelected = null;
-                    JPanelHoaDon.setNhanVienValueSelected(null);
-                    JPanelHoaDon.setManvchoosed("NULL");
-                    JPanelHoaDon.upDateListNhanVien();
-                    lbthongbao.setText("Bạn chưa chọn vật tư nào");
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Xóa nhân viên không thành công");
-                    ex.printStackTrace();
                 }
-
+                return;
+            }
+            int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa nhân viên: " + maNVValueSelected + "?");
+            if (choose == 0) {
+                GiaoDienQuanLy.delNhanVien(maNVValueSelected);
+                updateList();
+                JOptionPane.showMessageDialog(null, "Xóa nhân viên thành công");
+                maNVValueSelected=null;
+                lbthongbao.setText("Bạn chưa chọn vật tư nào");
             }
         }
 
         if (e.getSource() == btnresetNV){
+            updateList();
             txtmanv.setText("");
             txttennv.setText("");
             txthonv.setText("");

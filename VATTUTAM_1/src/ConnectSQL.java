@@ -17,16 +17,18 @@ public class ConnectSQL {
         ds.setDatabaseName("QuanLyVatTu");
         try {
             con = ds.getConnection();
-            System.out.println("SUCCESS");
-            System.out.println(con.getMetaData());
+         //   System.out.println("SUCCESS");
+       //     System.out.println(con.getMetaData());
         } catch (SQLServerException e) {
             e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
-
     public static Connection getCon() {
         return con;
     }
+//    public static void closeConnection(){
+//        this.con.close();
+//    }
 }

@@ -1,3 +1,5 @@
+import DoiTuong.VatTu;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -9,6 +11,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.*;
 
 public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
     private JTable tbvattu;
@@ -34,7 +38,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
     private static JLabel lbthongbao;
     private static boolean danglapHD_VT = false;
     private static int soLuongVatTu=0;
-
     public JPanelVatTu() {
         this.setBackground(new Color(255, 255, 255));
         this.setLayout(null);
@@ -92,26 +95,13 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         lbthongbao.setFont(new Font("Ubuntu", Font.PLAIN, 15));
         lbthongbao.setHorizontalAlignment(SwingConstants.CENTER);
 
-
+        /////TABLE VAT TU
         String[] columnJT = {"STT", "MAVT", "TENVT", "SO LUONG TON", "DON VI TINH"};
         Object[][] dataJT = {};
         model = new DefaultTableModel(dataJT, columnJT);
         tbvattu = new JTable(model);
 
-        String sql = "SELECT * FROM VATTU ORDER BY TENVT,MAVT";
-        try {
-            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-            ResultSet rs = pre.executeQuery();
-            int stt = 1;
-            while (rs.next()) {
-                model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
-                stt ++;
-            }
-            soLuongVatTu=stt-1;
-            pre.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        GiaoDienQuanLy.setModelVatTu(model);
 
         tbvattu.setFillsViewportHeight(true);
         tbvattu.setBackground(new Color(248, 249, 250));
@@ -215,7 +205,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btnresetVT.setIcon(reset_icon);
         btnresetVT.setIconTextGap(10);
 
-
         topContainer.add(btnaddVT);
         topContainer.add(btneditVT);
         topContainer.add(btnremoveVT);
@@ -235,7 +224,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btneditVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnresetVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnremoveVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
 
         topContainer.add(lbmavt);
         topContainer.add(lbdonvi);
@@ -267,60 +255,8 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
     public static void upDateList() {
         model.setRowCount(0);
-        String sql = "SELECT * FROM VATTU ORDER BY TENVT,MAVT";
-        try {
-            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-            ResultSet rs = pre.executeQuery();
-            int stt = 1;
-            while (rs.next()) {
-                model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
-                stt ++;
-            }
-            pre.close();
-            System.out.println("LOAD THÀNH CÔNG VẬT TƯ");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("ERROR LOAD");
-        }
+        GiaoDienQuanLy.setModelVatTu(model);
     }
-
-    public void addVT() {
-        txtdonvi.setText(ChuanHoa(txtdonvi.getText()));
-        txttenvt.setText(ChuanHoa(txttenvt.getText()));
-        if (txtmavt.getText().equals("") || txtdonvi.getText().equals("") || txtsoluongton.getText().equals("")
-                || txttenvt.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin vật tư");
-            return;
-        }else{
-            if ((txttenvt.getText().charAt(0)>='0' && txttenvt.getText().charAt(0) <= '9') ||
-                    (txtdonvi.getText().charAt(0) >= '0' && txtdonvi.getText().charAt(0) <= '9')){
-                System.out.println(txttenvt.getText());
-                System.out.println(txtdonvi.getText());
-                JOptionPane.showMessageDialog(null,"Tên vật tư và đơn vị tính không được bắt đầu bằng số !");
-                return;
-            }
-        }
-        String sql = "INSERT INTO VATTU VALUES (?, ?, ?, ?)";
-        try {
-            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-            pre.setInt(1, Integer.parseInt(txtmavt.getText()));
-            pre.setString(2, txttenvt.getText());
-            pre.setInt(3, Integer.parseInt(txtsoluongton.getText()));
-            pre.setString(4, txtdonvi.getText());
-            pre.executeUpdate();
-            model.addRow(new Object[]{tbvattu.getRowCount() + 1, Integer.parseInt(txtmavt.getText()),
-                    txttenvt.getText(), Integer.parseInt(txtsoluongton.getText()), txtdonvi.getText()});
-            JPanelHoaDon.getModelVatTu().addRow(new Object[]{Integer.parseInt(txtmavt.getText()),
-                    txttenvt.getText(), Integer.parseInt(txtsoluongton.getText()), txtdonvi.getText()});
-            upDateList();
-            JOptionPane.showMessageDialog(null, "Thêm vật tư thành công");
-            soLuongVatTu+=1;
-            pre.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Mã vật tư đã tồn tại");
-        }
-    }
-
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -361,22 +297,41 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-//        if(e.getSource() == txtsoluongton){
-//            System.out.println("SLT = "+txtsoluongton.getText());
-//        }
-//        if(e.getSource() == txtmavt){
-//            System.out.println("MVT ="+txtmavt.getText());
-//        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() == btnaddVT) {
-            addVT();
-
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền thêm vật tư!");
+                return;
+            }
+            txtdonvi.setText(ChuanHoa(txtdonvi.getText()));
+            txttenvt.setText(ChuanHoa(txttenvt.getText()));
+            if (txtmavt.getText().equals("") || txtdonvi.getText().equals("") || txtsoluongton.getText().equals("")
+                    || txttenvt.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin vật tư");
+                return;
+            }else{
+                if ((txttenvt.getText().charAt(0)>='0' && txttenvt.getText().charAt(0) <= '9') ||
+                        (txtdonvi.getText().charAt(0) >= '0' && txtdonvi.getText().charAt(0) <= '9')){
+                    JOptionPane.showMessageDialog(null,"Tên vật tư và đơn vị tính không được bắt đầu bằng số !");
+                    return;
+                }
+            }
+            if (GiaoDienQuanLy.checkVatTuDaTonTai(txtmavt.getText())){
+                JOptionPane.showMessageDialog(null, "Mã vật tư đã tồn tại");
+            }else{
+                GiaoDienQuanLy.addVatTu(txtmavt.getText(),txttenvt.getText(),Integer.parseInt(txtsoluongton.getText()),txtdonvi.getText());
+                upDateList();
+                JOptionPane.showMessageDialog(null, "Thêm vật tư thành công");
+            }
         }
         if (e.getSource() == btneditVT) {
-            //System.out.println("Chỉnh sửa vật tư: " + maVTValueSelected);
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền sửa thông tin vật tư!");
+                return;
+            }
             if(maVTValueSelected == null){
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một vật tư để chỉnh sửa");
             }
@@ -386,89 +341,54 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                             "đó sau đó quay lại chỉnh sửa vật tư");
                     return;
                 }
-                new EditVatTu(maVTValueSelected, tenVTValueSelected, donViValueSelected, soLuongSelected);
+                if (!EditVatTu.getCheckEditVatTu())
+                    new EditVatTu(maVTValueSelected, tenVTValueSelected, donViValueSelected, soLuongSelected);
             }
         }
 
         if (e.getSource() == btnresetVT) {
-            String query = "SELECT * FROM VATTU AS VT ORDER BY VT.TENVT";
-            try {
-                System.out.println(query);
-                model.setRowCount(0);
-                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
-                ResultSet rs = pre.executeQuery();
-                int stt = 1;
-                while (rs.next()) {
-                    model.addRow(new Object[]{stt, rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
-                    stt ++;
-                }
-                pre.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            upDateList();
+            lbthongbao.setText("Bạn chưa chọn vật tư nào");
             txtsoluongton.setText("");
             txttenvt.setText("");
             txtdonvi.setText("");
             txtmavt.setText("");
-            lbthongbao.setText("Bạn chưa chọn vật tư nào");
             maVTValueSelected = null;
         }
 
 
         if (e.getSource() == btnremoveVT) {
-//            System.out.println("Xóa Vật Tư: " + maVTValueSelected);
+            if (Login.getQuyenHanh()==0){
+                JOptionPane.showMessageDialog(null,"Bạn không có quyền xóa vật tư!");
+                return;
+            }
             if (maVTValueSelected == null) {
                 JOptionPane.showMessageDialog(null, "Vui lòng chọn một vật tư để xóa");
                 return;
-            }
-            String query = "SELECT MaVT FROM CTHOADON WHERE MAVT ="+ maVTValueSelected + " GROUP BY MaVT";
-            try {
-                PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
-                ResultSet rs = pre.executeQuery();
-                int dem = 0;
-                while (rs.next()) {
-                    dem ++;
-                }
-                if (dem>0){
-                    JOptionPane.showMessageDialog(null,"Vật tư đã tồn tại trong hóa đơn được lập trước đó nên không thể xóa!");
-                    pre.close();
-                    return;
-                }
-                pre.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
             }
             if(danglapHD_VT == true){
                 JOptionPane.showMessageDialog(null, "Vui lòng hoàn thành hóa đơn trước " +
                         "đó sau đó quay lại xóa vật tư");
                 return;
             }
+            if (GiaoDienQuanLy.isVatTuInHoaDon(maVTValueSelected)) {
+                JOptionPane.showMessageDialog(null, "Không thể xóa vì vật tư này đã tồn tại trong hóa đơn nhập/xuất!");
+                return;
+            }
             int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa vật tư: " + maVTValueSelected);
             if (choose == 0) {
-                String sql = "DELETE FROM VATTU WHERE " + "MAVT = " + maVTValueSelected;
-//                System.out.println("Sql = " + sql);
-                try {
-                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                    pre.executeUpdate();
-                    upDateList();
-                    pre.close();
-                    JOptionPane.showMessageDialog(null, "Xóa vật tư thành công");
-                    soLuongVatTu-=1;
-                    maVTValueSelected = null;
-                    JPanelHoaDon.setVatTuNameSelected(null);
-                    JPanelHoaDon.setVatTuValueSelected(null);
-                    JPanelHoaDon.setMavtchoosed("NULL");
-                    JPanelHoaDon.upDateListVatTu();
-                    lbthongbao.setText("Bạn chưa chọn vật tư nào");
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, "Xóa vật tư không thành công");
-                    ex.printStackTrace();
-                }
+                GiaoDienQuanLy.delVatTu(maVTValueSelected);
+                upDateList();
+                JOptionPane.showMessageDialog(null, "Xóa vật tư thành công");
+                maVTValueSelected = null;
+                JPanelHoaDon.setVatTuNameSelected(null);
+                JPanelHoaDon.setVatTuValueSelected(null);
+                JPanelHoaDon.setMavtchoosed("NULL");
+                JPanelHoaDon.upDateListVatTu();
+                lbthongbao.setText("Bạn chưa chọn vật tư nào");
             }
         }
     }
-
-
     @Override
     public void mousePressed(MouseEvent e) {
 //        if (e.getSource() == txtmavt) {
@@ -537,8 +457,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         maVTValueSelected = null;
         upDateList();
     }
-    public static int getSoLuongVatTu(){
-        return soLuongVatTu;
+    public static void main(String[] args){
+        JPanelVatTu t= new JPanelVatTu();
     }
-
 }

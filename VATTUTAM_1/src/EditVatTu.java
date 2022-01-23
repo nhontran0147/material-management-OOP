@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,8 +21,10 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
     private JTextField txtDonViTinh;
     private JLabel JLBHappy;
     private Connection con;
+    private static boolean checkEditVatTu = false;
     public EditVatTu(String MaVT, String TenVT, String DonViTinh, String SoLuongTon) {
-        System.out.println("EDIT MÃ VẬT TƯ: " + MaVT);
+        checkEditVatTu = true;
+//        System.out.println("EDIT MÃ VẬT TƯ: " + MaVT);
         this.setTitle("CHỈNH SỬA VẬT TƯ");
         this.setSize(WIDTH_EDIT, HEIGHT_EDIT);
         this.setLayout(null);
@@ -129,7 +128,11 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
         JLBHappy.setHorizontalAlignment(SwingConstants.CENTER);
         JPmain.add(JLBHappy);
 
-
+        this.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                checkEditVatTu = false;
+            }
+        });
         txtTenVatTu.setText(TenVT);
         txtTenVatTu.addKeyListener(this);
         txtMaVatTu.setText(MaVT);
@@ -160,28 +163,10 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
         {
             int result = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắc chỉnh sửa?");
             if(result == 0){
-                try {
-                    Statement stmt = con.createStatement();
-                    String sql = "UPDATE VATTU " +
-                            "SET TenVT = N'"+txtTenVatTu.getText()+ "', DONVITINH = N'"+txtDonViTinh.getText()+
-                            "' WHERE MAVT = "+Integer.parseInt(txtMaVatTu.getText());
-                    stmt.executeUpdate(sql);
-                    stmt.close();
-                    JPanelVatTu.upDateList();
-                    JPanelHoaDon.upDateListVatTu();
-                    JPanelVatTu.setMaVTValueSelected(null);
-                    JPanelVatTu.setThongBao("Bạn chưa chọn vật tư nào");
-                    JPanelHoaDon.setVatTuNameSelected(null);
-                    JPanelHoaDon.setVatTuValueSelected(null);
-                    JPanelHoaDon.setMavtchoosed("NULL");
-                    JOptionPane.showMessageDialog(null, "Chỉnh sửa vật tư thành công");
-                    this.dispose();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Chỉnh sửa vật tư thất bại");
-                }
+                GiaoDienQuanLy.changeVatTu(txtMaVatTu.getText(),txtTenVatTu.getText(),txtDonViTinh.getText());
+                checkEditVatTu= false;
+                this.dispose();
             }
-
         };
     }
 
@@ -212,11 +197,7 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
     public void keyReleased(KeyEvent e) {
 
     }
-}
-
-class TESTMAINNHE {
-    public static void main(String[] args) {
-        new EditVatTu("1000", "Xi Măng", "Bao", "2000");
+    public static boolean getCheckEditVatTu(){
+        return checkEditVatTu;
     }
 }
-

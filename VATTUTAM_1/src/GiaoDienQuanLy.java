@@ -1,37 +1,22 @@
+import DoiTuong.*;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.Connection;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 // SQL Sai kiểu dữ liệu
 // Xóa thì cho null
 public class GiaoDienQuanLy extends JFrame implements MouseListener {
-    private final int HEIGHT = 800;
-    private final int WIDTH = 1200;
-    private JPanel pn00;
-    private JPanel pn01; // Vat Tu
-    private JPanel pn02; // Nhan Vien
-    private JPanel pn03; // Hoa Don
-    private JPanel pn031; // Thong Ke
-    private JPanel pn04;
-    private JPanel pn05;
-    private JPanel pn06; // tab1
-    private JPanel pn07; // tab2
-    private JPanel pn08; // tab3
-    private JPanel pn09; // tab4
-    private JLabel lb00;
-    private JLabel lb01;
-    private JLabel lb02;
-    private JLabel lb03;
-    private JLabel lb031; // LB Thong ke
-    private JLabel lb04; // name tab1
-    private JLabel lb05; // name tab2
-    private JLabel lb06; // name tab3
-    private JLabel lb07; // name tab4
-    private JTabbedPane tbp01;
-    private static Connection con;
-
+    //
+    private static ArrayList<NhanVien> nhanVienArrayList;
+    private static ArrayList<VatTu> vatTuArrayList;
+    private static ArrayList<User> userArrayList;
+    private int quyenHanh;
     GiaoDienQuanLy() {
         this.setTitle("Giao Diện Quản Lý");
         this.setSize(WIDTH, HEIGHT);
@@ -39,8 +24,15 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         this.setLocationRelativeTo(null);
         this.setLayout(null);
         this.setResizable(false);
-        this.con = new ConnectSQL().getCon();
+        this.con =  ConnectSQL.getCon();
 
+        //
+        vatTuArrayList = new ArrayList<>();
+        nhanVienArrayList = new ArrayList<>();
+        userArrayList = new ArrayList<>();
+        loadDataToArrayList();
+        quyenHanh = Login.getQuyenHanh();
+        //
         pn00 = new JPanel();
         pn00.setBounds(0, 0, WIDTH, 50);
         pn00.setBackground(new Color(255, 85, 85));
@@ -49,7 +41,13 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb00.setForeground(Color.WHITE);
         pn00.add(lb00);
 
-        JLabel lb001 = new JLabel("XIN CHÀO, "+Login.getUserName());
+
+        String chucvu  = "";
+        if(Login.getQuyenHanh() == 2) {
+            chucvu = "Admin";
+        }else if (Login.getQuyenHanh()==1) chucvu = "Quản lí";
+        else chucvu = "Nhân viên";
+        JLabel lb001 = new JLabel("XIN CHÀO, "+Login.getUserName()+". ("+chucvu + ")");
         lb001.setForeground(new Color(255, 85, 85));
         lb001.setBounds(20, 20, 210, 100);
         lb001.setBackground(new Color(255, 209, 30));
@@ -114,33 +112,39 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb02.setIconTextGap(10);
         pn04.add(lb02);
 
+        if(quyenHanh != 2) {
+            pn05 = new JPanel();
+            pn05.setBounds(20, 340, 210, 60);
+            pn05.setLayout(null);
+            lb03 = new JLabel("QUẢN LÝ HÓA ĐƠN");
+            lb03.setSize(210, 60);
+            lb03.setOpaque(true);
+            lb03.setBackground(new Color(33, 205, 65));
+            lb03.setHorizontalAlignment(SwingConstants.CENTER);
+            lb03.setForeground(Color.WHITE);
 
-        pn05 = new JPanel();
-        pn05.setBounds(20, 340, 210, 60);
-        pn05.setLayout(null);
-        lb03 = new JLabel("QUẢN LÝ HÓA ĐƠN");
-        lb03.setSize(210, 60);
-        lb03.setOpaque(true);
-        lb03.setBackground(new Color(33, 205, 65));
-        lb03.setHorizontalAlignment(SwingConstants.CENTER);
-        lb03.setForeground(Color.WHITE);
-
-        ImageIcon icon03 = new ImageIcon(GiaoDienQuanLy.class.getResource("invoice.png"));
-        Image newimg03 = icon03.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
-        icon03.setImage(newimg03);
-        lb03.setIcon(icon03);
-        lb03.setIconTextGap(10);
-        pn05.add(lb03);
+            ImageIcon icon03 = new ImageIcon(GiaoDienQuanLy.class.getResource("invoice.png"));
+            Image newimg03 = icon03.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+            icon03.setImage(newimg03);
+            lb03.setIcon(icon03);
+            lb03.setIconTextGap(10);
+            pn05.add(lb03);
+            pn01.add(pn05);
+            lb03.addMouseListener(this);
+        }
 
 
         pn031 = new JPanel();
-        pn031.setBounds(20, 410, 210, 60);
+        if(quyenHanh == 2){
+            pn031.setBounds(20, 340, 210, 60);
+        }else {
+            pn031.setBounds(20, 410, 210, 60);
+        }
         pn031.setBackground(Color.magenta);
         pn031.setLayout(null);
         lb031 = new JLabel("QUẢN LÝ THỐNG KÊ");
         lb031.setSize(210, 60);
         lb031.setBackground(new Color(33, 205, 65));
-//        lb031.setBackground(new Color(17, 182, 202));
         lb031.setOpaque(true);
         lb031.setHorizontalAlignment(SwingConstants.CENTER);
         lb031.setForeground(Color.WHITE);
@@ -152,6 +156,32 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb031.setIconTextGap(10);
         pn031.add(lb031);
 
+
+        if(quyenHanh == 2) {
+            lb032 = new JLabel("ĐĂNG KÝ TÀI KHOẢN");
+            lb032.setBounds(20, 410, 210, 60);
+            lb032.setBackground(new Color(33, 205, 65));
+            lb032.setOpaque(true);
+            lb032.setHorizontalAlignment(SwingConstants.CENTER);
+            lb032.setForeground(Color.WHITE);
+
+            ImageIcon icon05 = new ImageIcon(GiaoDienQuanLy.class.getResource("signup.png"));
+            Image newimg05 = icon05.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+            icon05.setImage(newimg05);
+            lb032.setIcon(icon05);
+            lb032.setIconTextGap(10);
+            lb032.addMouseListener(this);
+            pn01.add(lb032);
+        }
+        logout = new JLabel("ĐĂNG XUẤT");
+        logout.setBounds(50, 600, 150, 40);
+        logout.setHorizontalAlignment(SwingConstants.CENTER);
+        logout.setOpaque(true);
+        logout.setForeground(Color.WHITE);
+        logout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        logout.setBackground(new Color(255, 85, 85));
+        pn01.add(logout);
+        logout.addMouseListener(this);
 
         tbp01 = new JTabbedPane();
         tbp01.setBorder(null);
@@ -174,45 +204,55 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         tbp01.add("", pn08);
         tbp01.add("", pn09);
 
-
         this.add(pn00);
         this.add(pn01);
         pn01.add(pn03);
         pn01.add(pn04);
-        pn01.add(pn05);
+//        pn01.add(pn05);
         pn01.add(pn031);
         this.add(pn02);
         pn02.add(tbp01);
 
         lb01.addMouseListener(this);
         lb02.addMouseListener(this);
-        lb03.addMouseListener(this);
         lb031.addMouseListener(this);
 
 
         this.setVisible(true);
-
-
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if(e.getSource() == this){
+            System.out.println("dang bam");
+            System.out.println(Signup.getCheckSignup());
+            if (Signup.getCheckSignup())
+                JOptionPane.showMessageDialog(null,"Vui lòng hoàn thành thao tác đăng kí tài khoản!");
+                return;
+        }
         if (e.getSource() == lb01) {
             tbp01.setSelectedIndex(0);
+
+            System.out.println(vatTuArrayList.get(0).getTenVatTu());
         } else if (e.getSource() == lb02) {
             tbp01.setSelectedIndex(1);
         } else if (e.getSource() == lb03) {
             tbp01.setSelectedIndex(2);
         } else if (e.getSource() == lb031) {
-            JPanelThongKe.setSoLuongVT(JPanelVatTu.getSoLuongVatTu());
+        //    JPanelThongKe.setSoLuongVT(JPanelVatTu.getSoLuongVatTu());
             JPanelThongKe.setSoLuongNV(JPanelNhanVien.getSoLuongNhanVien());
             tbp01.setSelectedIndex(3);
+        }else if(e.getSource() == lb032){
+            if (!Signup.getCheckSignup())
+                new Signup();
+        } else if(e.getSource() == logout){ // LOGOUT
+            this.dispose();
+            new Login();
         }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
     }
 
     @Override
@@ -230,6 +270,10 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             lb03.setBackground(new Color(124, 218, 73));
         } else if (e.getSource() == lb031) {
             lb031.setBackground(new Color(124, 218, 73));
+        }else if (e.getSource() == lb032) {
+            lb032.setBackground(new Color(124, 218, 73));
+        }else if (e.getSource() == logout) {
+            logout.setBackground(new Color(124, 218, 73));
         }
     }
 
@@ -243,9 +287,389 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             lb03.setBackground(new Color(33, 205, 65));
         } else if (e.getSource() == lb031) {
             lb031.setBackground(new Color(33, 205, 65));
+        }else if (e.getSource() == lb032) {
+            lb032.setBackground(new Color(33, 205, 65));
+        }else if (e.getSource() == logout) { //// LOGOUT
+            logout.setBackground(new Color(255, 85, 85));
         }
     }
 
+    public void loadDataToArrayList() {
+        String queryVatTu = "SELECT * FROM VATTU ORDER BY TENVT,MAVT";
+        try {
+            PreparedStatement pre = con.prepareStatement(queryVatTu);
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                vatTuArrayList.add(new VatTu(rs.getString("MaVT"), rs.getString("TenVT"), rs.getInt("SoLuongTon"), rs.getString("DonViTinh")));
+            }
+            pre.close();
+            System.out.println("LOAD THÀNH CÔNG VẬT TƯ o giao dien login");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("ERROR LOAD in login");
+        }
+        String queryNhanVien = "SELECT * FROM NHANVIEN ORDER BY TENNV,HONV";
+        try {
+            PreparedStatement pre = con.prepareStatement(queryNhanVien);
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                nhanVienArrayList.add(new NhanVien(rs.getString("MaNV"), rs.getString("HoNV"), rs.getString("TenNV"), rs.getString("Phai"), rs.getBoolean("TrangThai")));
+            }
+            pre.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (int i=0;i<nhanVienArrayList.size();++i){
+            String queryHoaDon = "SELECT * FROM HOADON WHERE MANV LIKE '" + nhanVienArrayList.get(i).getMaNhanVien() + "'";
+            try {
+                PreparedStatement pre = con.prepareStatement(queryHoaDon);
+                ResultSet rs = pre.executeQuery();
+                while (rs.next()) {
+                    HoaDon hoaDon= new HoaDon(rs.getString("SoHD"), rs.getDate("NgayLap"), rs.getString("Loai"));
+                    String queryChiTiet = "SELECT * FROM CTHOADON WHERE SOHD LIKE '" + hoaDon.getSoHoaDon() + "'";
+                    try {
+                        PreparedStatement pre1 = con.prepareStatement(queryChiTiet);
+                        ResultSet rs1 = pre1.executeQuery();
+                        while (rs1.next()) {
+//                            System.out.println("MaVT"+ rs1.getString("Mavt"));
+                            hoaDon.addChiTiet(new ChiTietHoaDon(rs1.getString("SoHD"), rs1.getString("MaVT"), rs1.getInt("SoLuong"), rs1.getInt("DonGia"), rs1.getInt("Vat")));
+                        }
+                        pre1.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    nhanVienArrayList.get(i).addHoaDon(hoaDon);
+                }
+                pre.close();
+
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+//            System.out.println("MaNV:" + nhanVienArrayList.get(i).getMaNhanVien());
+//            for(int j=0;j<nhanVienArrayList.get(i).getSoLuongHoaDon();++j){
+//                System.out.println("So HD:"+nhanVienArrayList.get(i).getHoaDonArrayList().get(j).getSoHoaDon());
+//                for(int k=0;k<nhanVienArrayList.get(i).getHoaDonArrayList().get(j).getChiTietHoaDon().size();++k){
+//                    System.out.println("MaVT:"+nhanVienArrayList.get(i).getHoaDonArrayList().get(j).getChiTietHoaDon().get(k).getMaVatTu());
+//                }
+//            }
+        }
+        String queryUser = "SELECT * FROM USERS";
+        try {
+            PreparedStatement pre = con.prepareStatement(queryUser);
+            ResultSet res = pre.executeQuery();
+            while (res.next()){
+                userArrayList.add(new User(res.getString("UserName"),res.getString("Pass"),res.getInt("Quyen")));
+            }
+            pre.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static ArrayList<NhanVien> getNhanVienArrayList(){
+        return nhanVienArrayList;
+    }
+
+    public static void addVatTu(String maVatTu, String tenVatTu, int soLuongTon, String donViTinh){
+        String queryVatTu = "INSERT INTO VATTU VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement pre = con.prepareStatement(queryVatTu);
+            pre.setString(1, maVatTu);
+            pre.setString(2, tenVatTu);
+            pre.setInt(3, soLuongTon);
+            pre.setString(4, donViTinh);
+            pre.executeUpdate();
+            pre.close();
+            vatTuArrayList.add(new VatTu(maVatTu,tenVatTu,soLuongTon,donViTinh));
+            vatTuArrayList.sort((Comparator.comparing(staff -> ((VatTu)staff).getTenVatTuKhongDau()).thenComparing(staff -> ((VatTu)staff).getMaVatTu())));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static boolean isVatTuInHoaDon(String maVatTu){
+        for (int i=0;i<nhanVienArrayList.size();++i){
+            ArrayList<HoaDon> hoaDonArrayList = nhanVienArrayList.get(i).getHoaDonArrayList();
+            for(int j=0;j<hoaDonArrayList.size();++j){
+                ArrayList<ChiTietHoaDon> chiTietHoaDonArrayList = hoaDonArrayList.get(j).getChiTietHoaDon();
+                for (int k=0;k < chiTietHoaDonArrayList.size();++k){
+                    if (chiTietHoaDonArrayList.get(k).getMaVatTu().equals(maVatTu))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static void delVatTu(String maVatTu){
+        for (VatTu vatTu: vatTuArrayList){
+            if (vatTu.getMaVatTu().equals(maVatTu)){
+                String sql = "DELETE FROM VATTU WHERE " + "MAVT like '" + vatTu.getMaVatTu() + "'";
+                try {
+                    PreparedStatement pre = con.prepareStatement(sql);
+                    pre.executeUpdate();
+                    pre.close();
+                    vatTuArrayList.remove(vatTu);
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
+        }
+    }
+    public static void changeVatTu(String maVatTu, String tenVatTu, String donViTinh){
+        for (VatTu vatTu: vatTuArrayList){
+            if (vatTu.getMaVatTu().equals(maVatTu)){
+                vatTu.setTenVatTu(tenVatTu);
+                vatTu.setDonViTinh(donViTinh);
+                String queryVatTu = "UPDATE VATTU " +
+                        "SET TenVT = N'"+vatTu.getTenVatTu()+ "', DONVITINH = N'"+vatTu.getDonViTinh() +
+                        "' WHERE MAVT like '"+ vatTu.getMaVatTu() + "'";
+                try {
+                    PreparedStatement pre = con.prepareStatement(queryVatTu);
+                    pre.executeUpdate();
+                    pre.close();
+                    vatTuArrayList.sort((Comparator.comparing(staff -> ((VatTu)staff).getTenVatTuKhongDau()).thenComparing(staff -> ((VatTu)staff).getMaVatTu())));
+                    JPanelVatTu.upDateList();
+                    JPanelHoaDon.upDateListVatTu();
+                    JPanelVatTu.setMaVTValueSelected(null);
+                    JPanelVatTu.setThongBao("Bạn chưa chọn vật tư nào");
+                    JPanelHoaDon.setVatTuNameSelected(null);
+                    JPanelHoaDon.setVatTuValueSelected(null);
+                    JPanelHoaDon.setMavtchoosed("NULL");
+                    JOptionPane.showMessageDialog(null, "Chỉnh sửa vật tư thành công");
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                return;
+            }
+        }
+    }
+    public static void setModelVatTu(DefaultTableModel model){
+        int stt=1;
+        for (VatTu vatTuTemp: vatTuArrayList){
+            model.addRow(vatTuTemp.toObjectsSTT(stt));
+            stt++;
+        }
+    }
+    public static boolean checkVatTuDaTonTai(String maVatTu){
+        for (VatTu vatTu: vatTuArrayList){
+            if (vatTu.getMaVatTu().equals(maVatTu))
+                return true;
+        }
+        return false;
+    }
+    public static int getSoLuongVatTu(){
+        return vatTuArrayList.size();
+    }
+    public static void changeModelNhanVien(DefaultTableModel model){
+        int stt=1;
+        for (NhanVien nhanVien: nhanVienArrayList){
+            model.addRow(nhanVien.toObjectsSTT(stt));
+            stt++;
+        }
+    }
+    public static boolean isTonTaiNhanVien(String maNhanVien){
+        for (NhanVien nhanVien:nhanVienArrayList){
+            if (nhanVien.getMaNhanVien().equals(maNhanVien))
+                    return true;
+        }
+        return false;
+    }
+    public static void addNhanVien(String maNhanVien, String hoNhanVien, String tenNhanVien, String phaiNhanVien){
+        String sql = "INSERT INTO NHANVIEN VALUES (?, ?, ?, ?,?)";
+        try {
+            PreparedStatement pre = con.prepareStatement(sql);
+            pre.setString(1, maNhanVien);
+            pre.setString(2, hoNhanVien);
+            pre.setString(3, tenNhanVien);
+            pre.setString(4, phaiNhanVien);
+            pre.setString(5,"1");
+            pre.executeUpdate();
+            pre.close();
+            nhanVienArrayList.add(new NhanVien(maNhanVien,hoNhanVien,tenNhanVien,phaiNhanVien,true));
+            nhanVienArrayList.sort(Comparator.comparing(staff -> ((NhanVien)staff).getTenNhanVienKhongDau()).thenComparing(staff -> ((NhanVien)staff).getHoNhanVienKhongDau()));
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+    public static boolean isNhanVienDaLapHoaDon(String maNhanVien){
+        for (int i=0;i<nhanVienArrayList.size();++i){
+            if (nhanVienArrayList.get(i).getMaNhanVien().equals(maNhanVien))
+                if (nhanVienArrayList.get(i).getSoLuongHoaDon()>0)
+                    return true;
+                else return false;
+        }
+        return false;
+    }
+    public static void changeNhanVien(String maNhanVien, String hoNhanVien, String tenNhanVien,String phaiNhanVien){
+        for (NhanVien nhanVien:nhanVienArrayList){
+            if (nhanVien.getMaNhanVien().equals(maNhanVien)){
+                nhanVien.setHoNhanVien(hoNhanVien);
+                nhanVien.setTenNhanVien(tenNhanVien);
+                nhanVien.setPhaiNhanVien(phaiNhanVien);
+                try {
+                    Statement stmt = con.createStatement();
+                    String sql = "UPDATE NHANVIEN " +
+                            "SET TenNV = N'"+ nhanVien.getTenNhanVien()+ "', Phai = N'"+ nhanVien.getPhaiNhanVien()+"', "+
+                            "HONV = N'"+ nhanVien.getHoNhanVien() +
+                            "' WHERE MANV like '"+ nhanVien.getMaNhanVien() + "'";
+                    stmt.executeUpdate(sql);
+                    stmt.close();
+                    JPanelNhanVien.setMaNVValueSelected(null);
+                    JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thành công");
+                    nhanVienArrayList.sort(Comparator.comparing(staff -> ((NhanVien)staff).getTenNhanVienKhongDau()).thenComparing(staff -> ((NhanVien)staff).getHoNhanVienKhongDau()));
+                    JPanelNhanVien.updateList();
+                    JPanelHoaDon.upDateListNhanVien();
+                    JPanelNhanVien.setThongBao("Bạn chưa chọn nhân viên nào");
+                    JPanelHoaDon.setNhanVienValueSelected(null);
+                    JPanelHoaDon.setManvchoosed("NULL");
+                    return;
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+    public static void changeTrangThaiNhanVien(String maNhanVien,boolean trangThai){
+        if (trangThai==false){
+            for (User user: userArrayList){
+                if(user.getUserName().equals(maNhanVien)){
+                    String sql = "DELETE FROM USERS WHERE MANV LIKE '" + user.getUserName() + "'";
+                    try{
+                        PreparedStatement pre = con.prepareStatement(sql);
+                        pre.executeUpdate();
+                        pre.close();
+                        userArrayList.remove(user);
+                    }catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        for(NhanVien nhanVien: nhanVienArrayList){
+            if (nhanVien.getMaNhanVien().equals(maNhanVien)){
+                nhanVien.setTrangThai(trangThai);
+                try {
+                    Statement stmt = con.createStatement();
+                    String tt=(trangThai==true  ? "1":"0");
+                    String sql = "UPDATE NHANVIEN " +
+                            "SET TrangThai = '" +tt+
+                            "' WHERE MANV like '"+ maNhanVien + "'";
+                    stmt.executeUpdate(sql);
+                    stmt.close();
+                    JPanelNhanVien.setMaNVValueSelected(null);
+                    JPanelNhanVien.updateList();
+                    JPanelHoaDon.upDateListNhanVien();
+                    JPanelNhanVien.setThongBao("Bạn chưa chọn nhân viên nào");
+                    JPanelHoaDon.setNhanVienValueSelected(null);
+                    JPanelHoaDon.setManvchoosed("NULL");
+                    return;
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+    public static void delNhanVien(String maNhanVien){
+        for (User user: userArrayList){
+            if(user.getUserName().equals(maNhanVien)){
+                String sql = "DELETE FROM USERS WHERE MANV LIKE '" + user.getUserName() + "'";
+                try{
+                    PreparedStatement pre = con.prepareStatement(sql);
+                    pre.executeUpdate();
+                    pre.close();
+                    userArrayList.remove(user);
+                }catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        for (NhanVien nhanVien: nhanVienArrayList){
+            if(nhanVien.getMaNhanVien().equals(maNhanVien)){
+                String sql = "DELETE FROM NHANVIEN WHERE MANV LIKE '" + nhanVien.getMaNhanVien() + "'";
+                try {
+                    PreparedStatement pre = con.prepareStatement(sql);
+                    pre.executeUpdate();
+                    pre.close();
+                    nhanVienArrayList.remove(nhanVien);
+                    JPanelHoaDon.setNhanVienValueSelected(null);
+                    JPanelHoaDon.setManvchoosed("NULL");
+                    JPanelHoaDon.upDateListNhanVien();
+                    return;
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        }
+    }
+    public static boolean isUserTonTai(String maNV){
+        for (User user: userArrayList){
+            if (user.getUserName().equals(maNV))
+                return true;
+        }
+        return false;
+    }
+    public static void changeUser(String maNv, String passWord,int quyen){
+        for (User user: userArrayList){
+            if (user.getUserName().equals(maNv)){
+                user.setPassWord(passWord);
+                String sql = "UPDATE USERS SET PASS ='" + passWord + "', QUYEN = " + String.valueOf(quyen) + " WHERE Username LIKE '" + maNv + "'";
+                try {
+                    PreparedStatement pre = con.prepareStatement(sql);
+                    pre.executeUpdate();
+                    pre.close();
+                }catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+    public static void addUser(User user){
+        userArrayList.add(user);
+        String sql = "INSERT INTO USERS VALUES (?, ?, ?)";
+        try {
+            PreparedStatement pre = con.prepareStatement(sql);
+            pre.setString(1, user.getUserName());
+            pre.setString(2, user.getPassWord());
+            pre.setInt(3, user.getQuyen());
+            pre.executeUpdate();
+            pre.close();
+            JOptionPane.showMessageDialog(null, "Tạo tài khoản thành công");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Lỗi tạo tài khoản");
+            ex.printStackTrace();
+        }
+    }
+
+    private final int HEIGHT = 800;
+    private final int WIDTH = 1200;
+    private JPanel pn00;
+    private JPanel pn01; // Vat Tu
+    private JPanel pn02; // Nhan Vien
+    private JPanel pn03; // Hoa Don
+    private JPanel pn031; // Thong Ke
+    private JPanel pn04;
+    private JPanel pn05;
+    private JPanel pn06; // tab1
+    private JPanel pn07; // tab2
+    private JPanel pn08; // tab3
+    private JPanel pn09; // tab4
+    private JLabel lb00;
+    private JLabel lb01;
+    private JLabel lb02;
+    private JLabel lb03;
+    private JLabel lb031; // LB Thong ke
+    private JLabel lb032;
+    private JLabel lb04; // name tab1
+    private JLabel lb05; // name tab2
+    private JLabel lb06; // name tab3
+    private JLabel lb07; // name tab4
+    private JTabbedPane tbp01;
+    private static Connection con;
+    private JLabel logout;
 }
 
 class TESTPRO {

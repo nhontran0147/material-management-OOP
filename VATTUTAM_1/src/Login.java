@@ -1,3 +1,6 @@
+import DoiTuong.NhanVien;
+import DoiTuong.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,7 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import DoiTuong.User;
 public class Login extends JFrame implements ActionListener, KeyListener {
     private final int WIDTH_LOGIN = 400;
     private final int HEIGHT_LOGIN = 340;
@@ -19,9 +23,14 @@ public class Login extends JFrame implements ActionListener, KeyListener {
     private JPasswordField txtPassword;
     private JLabel JLBPassword;
     private JButton btnLogin;
-    private JLabel JLBHappy;
-    private String txt = "";
     private static String userName;
+    private static int quyenHanh = -1;
+    private static String MaNV;
+    private static String HoNV;
+    private static String TenNV;
+    private static String PhaiNV;
+    private ArrayList<User> userArrayList;
+
     private static Connection con;
 
     public Login() {
@@ -33,6 +42,8 @@ public class Login extends JFrame implements ActionListener, KeyListener {
         this.setResizable(false);
         this.con = new ConnectSQL().getCon();
 
+        userArrayList = new ArrayList<>();
+        loadDataUser();
         JPmain = new JPanel();
         JPmain.setBounds(0, 0, WIDTH_LOGIN, HEIGHT_LOGIN);
         JPmain.setLayout(null);
@@ -88,13 +99,8 @@ public class Login extends JFrame implements ActionListener, KeyListener {
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         JPmain.add(btnLogin);
 
-        JLBHappy = new JLabel("Chào ngày mới vui vẻ");
-        JLBHappy.setBounds((WIDTH_LOGIN - 200) / 2, 260, 200, 30);
-        JLBHappy.setHorizontalAlignment(SwingConstants.CENTER);
-        JPmain.add(JLBHappy);
-
         this.add(JPmain);
-        this.addKeyListener(this);
+        txtPassword.addKeyListener(this);
         txtUsername.addKeyListener(this);
 
         this.setVisible(true);
@@ -103,35 +109,33 @@ public class Login extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String sql = "SELECT * FROM USERS WHERE USERS.USERNAME = '"+txtUsername.getText()+"'";
-        System.out.println("SQL ="+sql);
-        boolean temp=false;
-        try {
-            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-            ResultSet rs = pre.executeQuery();
-            while (rs.next()) {
-                if(rs.getString("USERNAME").equals(txtUsername.getText()) && rs.getString("PASS").equals(txtPassword.getText())){
-                    JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
-                    temp = true;
-                    this.userName = txtUsername.getText();
-                    this.dispose();
-                    new GiaoDienQuanLy();
+        boolean checkDN = false;
+        for (User user: userArrayList){
+            if (user.getUserName().equals(txtUsername.getText()) && user.getPassWord().equals(String.valueOf(txtPassword.getPassword()))){
+                this.userName = user.getUserName();
+                this.quyenHanh = user.getQuyen();
+                MaNV = user.getUserName();
+                checkDN = true;
+                break;
+            }
+        }
+        if (checkDN == false){
+            JOptionPane.showMessageDialog(null,"Tài khoản hoặc mật khẩu không đúng!");
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
+            this.dispose();
+            new GiaoDienQuanLy();
+            ArrayList<NhanVien> nhanVienArrayList= GiaoDienQuanLy.getNhanVienArrayList();
+            for (NhanVien nhanVien:nhanVienArrayList){
+                if (nhanVien.getMaNhanVien().equals(MaNV)){
+                    HoNV = nhanVien.getHoNhanVien();
+                    TenNV = nhanVien.getTenNhanVien();
+                    PhaiNV = nhanVien.getPhaiNhanVien();
+                    break;
                 }
             }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
         }
-        if (!temp)
-            JOptionPane.showMessageDialog(null, "Sai thông tin đăng nhập...");
-
-
-
-//        if (txtPassword.getText().equals("123456") && txtUsername.getText().equals("admin")) {
-//            JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
-//            new GiaoDienQuanLy();
-//            this.dispose();
-//        } else JOptionPane.showMessageDialog(null, "Sai thông tin đăng nhập...");
     }
 
     @Override
@@ -141,12 +145,7 @@ public class Login extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-//        if(e.getSource() == txtUsername){
-//            if(e.getKeyCode() > 65 && e.getKeyCode() < 90) {
-//                txt += e.getKeyChar();
-//            }
-//            txtUsername.setText(txt);
-//        }
+
     }
 
     @Override
@@ -154,11 +153,39 @@ public class Login extends JFrame implements ActionListener, KeyListener {
 
     }
 
-    public static void main(String[] args) {
-        new Login();
-    }
-
     public static String getUserName() {
         return userName;
+    }
+
+    public static int getQuyenHanh() {
+        return quyenHanh;
+    }
+
+    public static String[] ObjNhanVien (){
+        return new String[] {String.valueOf(MaNV), HoNV, TenNV, PhaiNV};
+    }
+
+    public static String getMaNV() {
+        return MaNV;
+    }
+
+    public static String getTenNV() {
+        return HoNV +" " + TenNV;
+    }
+    private void loadDataUser(){
+        String query = "SELECT * FROM USERS";
+        try {
+            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
+            ResultSet rs = pre.executeQuery();
+            while (rs.next())
+                userArrayList.add(new User(rs.getString("UserName"),rs.getString("PASS"),rs.getInt("QUYEN")));
+            pre.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+    public static void main(String[] args) {
+        new Login();
     }
 }

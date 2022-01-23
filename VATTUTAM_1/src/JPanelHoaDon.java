@@ -46,6 +46,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
     private int nhanVienRowSelected = -1;
     private JLabel lbloaihd;
     private JLabel lbngaylap;
+    private JLabel lbValueNgayLap;
     private JLabel lbsohd;
     private JLabel lbsotaohd;
     private JLabel lbsoluong;
@@ -54,7 +55,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
     private static String txtloaihd = "";
     private JLabel lbhdnhap;
     private JLabel lbhdxuat;
-    private static JDateChooser datelaphd;
+   // private static JDateChooser datelaphd;
     private static JTextField txtsohd;
     private static JTextField txtsoluong;
     private static JTextField txtvat;
@@ -90,6 +91,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
             while (rs.next()) {
                 modelVatTu.addRow(new Object[]{rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
             }
+            pre.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -132,12 +134,12 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
                     vatTuNameSelected = tbvattu.getValueAt(tbvattu.getSelectedRow(), 1).toString();
                     conlaiVatTuValueSelected = tbvattu.getValueAt(tbvattu.getSelectedRow(), 2).toString();
 
-                    System.out.println("Xóa mã vật tư " + vatTuValueSelected + ", row: " + tbvattu.getSelectedRow() +
-                            "SL con lai = "+ conlaiVatTuValueSelected + " bảng vật tư");
+                    //System.out.println("Xóa mã vật tư " + vatTuValueSelected + ", row: " + tbvattu.getSelectedRow() +
+                      //      "SL con lai = "+ conlaiVatTuValueSelected + " bảng vật tư");
                     mavtchoosed.setText(vatTuValueSelected);
                 }
             }
-        });
+        })  ;
 
 
         String[] columnJT1 = {"MANV", "HONV", "TENNV", "PHAI"};
@@ -155,8 +157,6 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         tbnhanvien.setFillsViewportHeight(true);
         tbnhanvien.setOpaque(true);
         tbnhanvien.setShowGrid(false); // Tắt kẻ bảng
@@ -207,6 +207,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         lbloaihd.setBounds(30, 50, 100, 30);
 
 
+
         lbhdnhap = new JLabel("NHẬP");
         lbhdnhap.setBounds(150, 50, 70, 30);
         lbhdnhap.setBackground(new Color(102, 195, 239));
@@ -226,10 +227,20 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
 
 
         Calendar cal = Calendar.getInstance();
-        datelaphd = new JDateChooser(cal.getTime());
-        datelaphd.setBounds(450, 50, 120, 30);
-        datelaphd.setFont(new Font("Arial", Font.PLAIN, 15));
-        datelaphd.setDateFormatString("dd/MM/yyyy");
+        SimpleDateFormat fm1 = new SimpleDateFormat("dd/MM/yyyy");
+        String da= fm1.format(cal.getTime());
+        lbValueNgayLap = new JLabel(da);
+        lbValueNgayLap.setOpaque(true);
+       // lbValueNgayLap.setBackground(new Color(102 ,195,239));
+        lbValueNgayLap.setBounds(450,50,120,30);
+        lbValueNgayLap.setForeground(new Color(33, 205, 65));
+        lbValueNgayLap.setHorizontalAlignment(SwingConstants.CENTER);
+        lbValueNgayLap.setFont(new Font("Arial", Font.PLAIN, 17));
+        //datelaphd = new JDateChooser(cal.getTime());
+        //datelaphd.setEnabled();
+//        datelaphd.setBounds(450, 50, 120, 30);
+//        datelaphd.setFont(new Font("Arial", Font.PLAIN, 15));
+//        datelaphd.setDateFormatString("dd/MM/yyyy");
 
         lbsohd = new JLabel("Số Hóa Đơn: ");
         lbsohd.setBounds(600, 50, 80, 30);
@@ -398,12 +409,15 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         this.add(lbthongbao);
         this.add(lbtongtien);
 
-//        this.add(txtloaihd);
         this.add(lbhdnhap);
         this.add(lbhdxuat);
 
 //        this.add(txtngaylap);
-        this.add(datelaphd);
+        this.add(lbValueNgayLap);
+        //this.add(datelaphd);
+        txtsoluong.addKeyListener(this);
+        txtdongia.addKeyListener(this);
+        txtvat.addKeyListener(this);
         this.add(txtsohd);
         this.add(txttimnv);
         this.add(txttimvt);
@@ -430,10 +444,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
 
 
         String[] columnJT2 = {"STT", "MAVT", "TENVT", "SOLUONG", "DONGIA", "VAT", "THANHTIEN"};
-        Object[][] dataJT2 = {
-//                {1, 1000, "Xi Măng", 20000, 999999999, 0.01, 999999999},
-
-        };
+        Object[][] dataJT2 = {};
 
 
         modelHoaDon = new DefaultTableModel(dataJT2, columnJT2);
@@ -492,6 +503,9 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         this.add(JS2);
     }
 
+//    private void add(String txtloaihd) {
+//    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -499,6 +513,27 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getSource()==txtsoluong){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtsoluong.getText().length()<6) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtsoluong.setEditable(true);
+            } else {
+                txtsoluong.setEditable(false);
+            }
+        }
+        if (e.getSource()==txtdongia){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtdongia.getText().length()<9) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtdongia.setEditable(true);
+            } else {
+                txtdongia.setEditable(false);
+            }
+        }
+        if (e.getSource()==txtvat){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtvat.getText().length()<2) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtvat.setEditable(true);
+            } else {
+                txtvat.setEditable(false);
+            }
+        }
 
     }
 
@@ -507,27 +542,22 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         if (e.getSource() == txttimvt) {
             vatTuValueSelected = null;
             vatTuRowSelected = -1;
+            mavtchoosed.setText("NULL");
             String queryVatTu;
+           queryVatTu = "SELECT * FROM VATTU AS VT WHERE VT.MAVT like '%" + txttimvt.getText() + "%' or VT.TENVT LIKE N'%" + txttimvt.getText() + "%'";
             try {
-                int intValue = Integer.parseInt(txttimvt.getText());
-                queryVatTu = "SELECT * FROM VATTU AS VT WHERE VT.MAVT ='" + txttimvt.getText() + "'";
-            } catch (NumberFormatException ex) {
-                queryVatTu = "SELECT * FROM VATTU AS VT WHERE VT.TENVT LIKE N'%" + txttimvt.getText() + "%'";
-            }
-
-            try {
-                System.out.println(queryVatTu);
                 modelVatTu.setRowCount(0);
                 PreparedStatement pre = ConnectSQL.getCon().prepareStatement(queryVatTu);
                 ResultSet rs = pre.executeQuery();
                 while (rs.next()) {
-                    modelVatTu.addRow(new Object[]{rs.getInt("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
+                    modelVatTu.addRow(new Object[]{rs.getString("MaVT"), rs.getString("TenVT"), rs.getString("SoLuongTon"), rs.getString("DonViTinh")});
                 }
+                pre.close();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         }
-
+        //fix quyen truy cap
         if (e.getSource() == txttimnv) {
             nhanVienValueSelected = null;
             nhanVienRowSelected = -1;
@@ -582,27 +612,19 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
                 Date Two = Calendar.getInstance().getTime();
                 long kc = (Two.getTime() - One.getTime());
                 txtsohd.setText(String.valueOf(kc));
-
             } catch (ParseException ex) {
                 ex.printStackTrace();
             }
-
-
         }
-
         if(e.getSource() == btnaddHD){
             if(txtloaihd.equals("")){
-                JOptionPane.showMessageDialog(null, "Bạn chưa loại hóa đơn");
+                JOptionPane.showMessageDialog(null, "Bạn chưa loại hóa đơn!");
                 return;
             }
-
-            if(CheckDate() == false) return;
-
             if(txtsohd.getText().equals("")){
                 JOptionPane.showMessageDialog(null, "Bạn chưa tạo số hóa đơn");
                 return;
             }
-
             if(vatTuNameSelected == null
                     || vatTuValueSelected == null
                     || mavtchoosed.getText() == "NULL"
@@ -611,33 +633,32 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
                 return;
             }
 
+            ///can fix lai
             if(nhanVienValueSelected == null || manvchoosed.equals("") || manvchoosed.getText() == "NULL"){
                 JOptionPane.showMessageDialog(null, "Bạn chưa chọn nhân viên");
                 return;
             }
+            ////////
 
             if(txtsoluong.getText().equals("")){
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập số lượng");
                 return;
             }
-
-            if(txtloaihd.equals("Xuất") && conlaiVatTuValueSelected != null && Integer.parseInt(conlaiVatTuValueSelected) < Integer.parseInt(txtsoluong.getText())){
-                System.out.println("Con Lai Selected = "+ conlaiVatTuValueSelected);
-                JOptionPane.showMessageDialog(null, "Số lượng nhập vượt quá lượng tồn. " +
-                        vatTuValueSelected+" _ "+vatTuNameSelected+" Còn lại: "+ conlaiVatTuValueSelected);
-                return;
-            }
-
             if(txtdongia.getText().equals("")){
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đơn giá");
                 return;
             }
-
             if(txtvat.getText().equals("")){
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập phí VAT");
                 return;
             }
 
+            if(txtloaihd.equals("Xuất") && conlaiVatTuValueSelected != null && Integer.parseInt(conlaiVatTuValueSelected) < Integer.parseInt(txtsoluong.getText())){
+               // System.out.println("Con Lai Selected = "+ conlaiVatTuValueSelected);
+                JOptionPane.showMessageDialog(null, "Số lượng Xuất vượt quá lượng tồn!. \n" +
+                        vatTuValueSelected+" _ "+vatTuNameSelected+" Còn lại: "+ conlaiVatTuValueSelected);
+                return;
+            }
             if(CheckSanPhamDaTonTai() == true){
                 CapNhatMatHang();
                 return;
@@ -697,12 +718,12 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
                 JOptionPane.showMessageDialog(null, "Chưa có mặt hàng nào");
                 return;
             }
-            if(CheckDate() == false) return; // Check Date
+            //if(CheckDate() == false) return; // Check Date
             int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn lưu và in Hóa Đơn");
             if(choose == 0){
                 SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
-                String nLap = fm.format(datelaphd.getDate());
-                new BillHoaDon(tbhoadon, txtloaihd, txtsohd.getText(), nhanVienValueSelected, nhanvienNameSelected, nLap, String.valueOf(ChuanHoa.ChuyenTienSangSo(lbtongtien.getText())));
+               // String nLap = fm.format(datelaphd.getDate());
+              //  new BillHoaDon(tbhoadon, txtloaihd, txtsohd.getText(), nhanVienValueSelected, nhanvienNameSelected, nLap, String.valueOf(ChuanHoa.ChuyenTienSangSo(lbtongtien.getText())));
             }
         }
 
@@ -825,7 +846,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         return false;
     }
     public void CapNhatMatHang(){
-        int choose = JOptionPane.showConfirmDialog(null, "Mã vật tư đã tồn tại trong hóa đơn, bạn có muốn cập nhật mới");
+        int choose = JOptionPane.showConfirmDialog(null, "Mã vật tư đã tồn tại trong hóa đơn, bạn có muốn cập nhật lại?");
         if(choose == 0){
             for (int i = 0; i < tbhoadon.getRowCount(); i++) {
                 if (tbhoadon.getValueAt(i, 1).toString().equals(mavtchoosed.getText())){
@@ -834,11 +855,13 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
                     tbhoadon.setValueAt(txtvat.getText(), i, 5);
                     tbhoadon.setValueAt(ChuanHoa.ChuyenSoThanhTien(String.valueOf(
                             (Long.parseLong(txtdongia.getText())) * (((long) Long.parseLong(txtsoluong.getText()) * (100 + Integer.parseInt(txtvat.getText())))) / 100)), i, 6);
+
                     // Cap nhat bien matHang
-                    donGiaMatHang = txtdongia.getText();
-                    vatMatHang = txtvat.getText();
-                    soLuongMatHang = txtsoluong.getText();
+//                    donGiaMatHang = txtdongia.getText();
+//                    vatMatHang = txtvat.getText();
+//                    soLuongMatHang = txtsoluong.getText();
                     JOptionPane.showMessageDialog(null, "Cập nhật mặt hàng thành công");
+                    break;
                 };
             }
         }
@@ -897,7 +920,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
 
     public static void reSetALL(){
         modelHoaDon.setRowCount(0);
-        datelaphd.setDate(Calendar.getInstance().getTime());
+        //datelaphd.setDate(Calendar.getInstance().getTime());
         txtsoluong.setText("");
         txtdongia.setText("");
         txtvat.setText("");
@@ -909,26 +932,26 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         upDateListVatTu();
     }
 
-    public boolean CheckDate(){
-        if(datelaphd.getDate() == null){
-            JOptionPane.showMessageDialog(null, "Ngày nhập không hợp lệ");
-            return false;
-        }
-        else if(datelaphd.getDate() != null){
-            SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
-            String d = fm.format(Calendar.getInstance().getTime());
-            try {
-                Date B = fm.parse(d);
-                if((datelaphd.getDate().getTime() - B.getTime()) / (1000 * 60 * 60 * 24) > 0){
-                    JOptionPane.showMessageDialog(null, "Bạn nhập lộn ngày mai ngày mốt rùi");
-                    return false;
-                }
-            } catch (ParseException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return true;
-    }
+//    public boolean CheckDate(){
+//        if(datelaphd.getDate() == null){
+//            JOptionPane.showMessageDialog(null, "Ngày nhập không hợp lệ");
+//            return false;
+//        }
+//        else if(datelaphd.getDate() != null){
+//            SimpleDateFormat fm = new SimpleDateFormat("dd/MM/yyyy");
+//            String d = fm.format(Calendar.getInstance().getTime());
+//            try {
+//                Date B = fm.parse(d);
+//                if((datelaphd.getDate().getTime() - B.getTime()) / (1000 * 60 * 60 * 24) > 0){
+//                    JOptionPane.showMessageDialog(null, "Bạn nhập lộn ngày mai ngày mốt rùi");
+//                    return false;
+//                }
+//            } catch (ParseException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//        return true;
+//    }
 
 
 }
