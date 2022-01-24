@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class EditVatTu extends JFrame implements ActionListener, KeyListener {
+public class EditVatTu extends JDialog implements ActionListener, KeyListener {
     private final int WIDTH_EDIT = 500;
     private final int HEIGHT_EDIT = 450;
     private JPanel JPmain;
@@ -31,6 +31,7 @@ public class EditVatTu extends JFrame implements ActionListener, KeyListener {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.con = ConnectSQL.getCon();
+        this.setModal(true);
 
         JPmain = new JPanel();
         JPmain.setBounds(0, 0, WIDTH_EDIT, HEIGHT_EDIT);

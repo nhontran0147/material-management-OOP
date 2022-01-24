@@ -78,4 +78,8 @@ public class NhanVien {
         else
             return new Object[] {number,maNhanVien,hoNhanVien,tenNhanVien,phaiNhanVien,"0"};
     }
+    public Object[] toObjectsSTT(){
+        return new Object[] {maNhanVien,hoNhanVien,tenNhanVien,phaiNhanVien};
+
+    }
 }

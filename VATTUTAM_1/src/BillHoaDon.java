@@ -1,3 +1,6 @@
+import DoiTuong.ChiTietHoaDon;
+import DoiTuong.HoaDon;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -9,7 +12,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public class BillHoaDon extends JFrame implements ActionListener, KeyListener {
+public class BillHoaDon extends JDialog implements ActionListener, KeyListener {
     private final int WIDTH_EDIT = 920;
     private final int HEIGHT_EDIT = 600;
     private JPanel JPmain;
@@ -40,7 +43,7 @@ public class BillHoaDon extends JFrame implements ActionListener, KeyListener {
         this.setLayout(null);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-
+        this.setModal(true);
         this.tbp = tb;
         this.tongTienHangTB = tongTien;
         this.nvLapHD = tenNV;
@@ -179,36 +182,43 @@ public class BillHoaDon extends JFrame implements ActionListener, KeyListener {
         }
 
         if (e.getSource() == btnLuuHDSQL) {
-            String truyvan = "INSERT INTO HOADON VALUES(?, ?, ?)";
+            String loai = (loaiHD.equals("Nhập") ? "N":"X");
+            java.util.Date day = new java.util.Date();
+            HoaDon hoaDon = new HoaDon(soHD,day,loai);
+            String truyvan = "INSERT INTO HOADON VALUES(?, ?, ?, ?)";
             try {
                 PreparedStatement pre = ConnectSQL.getCon().prepareStatement(truyvan);
-                pre.setInt(1, Integer.parseInt(soHD));
-                pre.setDate(2, new Date(new SimpleDateFormat("dd/MM/yyyy").parse(ngayLapHD).getTime()));
+                pre.setString(1, soHD);
+                pre.setDate(2, new Date(new SimpleDateFormat("yyyy/MM/dd").parse(ngayLapHD).getTime()));
                 if(loaiHD.equals("Nhập"))
                     pre.setString(3, "N");
                 else pre.setString(3, "X");
+                pre.setString(4,maNV);
                 pre.executeUpdate();
+                pre.close();
             } catch (SQLException | ParseException ex) {
                 JOptionPane.showMessageDialog(null, "Thêm Hóa Đơn Lỗi....");
                 ex.printStackTrace();
             }
 
             for (int i = 0; i < tbp.getRowCount(); i++) {
-                String sql = "INSERT INTO CTHOADON VALUES (?, ?, ?, ?, ?, ?)";
+                hoaDon.addChiTiet(new ChiTietHoaDon(soHD,tbp.getValueAt(i,1).toString(),Integer.parseInt(tbp.getValueAt(i,3).toString()),Integer.parseInt(tbp.getValueAt(i, 4).toString()),Float.parseFloat(tbp.getValueAt(i, 5).toString())));
+                String sql = "INSERT INTO CTHOADON VALUES (?, ?, ?, ?, ?)";
                 try {
                     PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                    pre.setInt(1, Integer.parseInt(soHD));
-                    pre.setInt(2, Integer.parseInt(maNV));
-                    pre.setInt(3, Integer.parseInt(tbp.getValueAt(i, 1).toString()));
-                    pre.setInt(4, Integer.parseInt(tbp.getValueAt(i, 3).toString())); // Long
-                    pre.setInt(5, Integer.parseInt(tbp.getValueAt(i, 4).toString()));
-                    pre.setFloat(6, Float.parseFloat(tbp.getValueAt(i, 5).toString()));
+                    pre.setString(1,soHD);
+                    pre.setString(2, tbp.getValueAt(i, 1).toString());
+                    pre.setInt(3, Integer.parseInt(tbp.getValueAt(i, 3).toString())); // Long
+                    pre.setInt(4, Integer.parseInt(tbp.getValueAt(i, 4).toString()));
+                    pre.setFloat(5, Float.parseFloat(tbp.getValueAt(i, 5).toString()));
                     pre.executeUpdate();
+                    pre.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Thêm CT Hóa Đơn Lỗi....");
                 }
             }
+            GiaoDienQuanLy.addHoaDon(maNV,hoaDon);
             JOptionPane.showMessageDialog(null, "Thêm CTHD và Hóa Đơn vào CSDL thành công");
 
             // 1, "1000", "Xi Măng", 120, 33, 44, "434,353,553"
@@ -218,23 +228,24 @@ public class BillHoaDon extends JFrame implements ActionListener, KeyListener {
 
             for (int i = 0; i<tbp.getRowCount(); i++){
                 String sql = "UPDATE VATTU " +
-                "SET SoLuongTon = SoLuongTon "+ congTru + " "+tbp.getValueAt(i, 3).toString() +" WHERE MaVT = "+tbp.getValueAt(i, 1).toString();
+                "SET SoLuongTon = SoLuongTon "+ congTru + " "+tbp.getValueAt(i, 3).toString() +" WHERE MaVT like '"+tbp.getValueAt(i, 1).toString()+"'";
                 try {
                     PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
                     pre.executeUpdate();
+                    pre.close();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "LỖI CẬP NHẬT LƯỢNG TỒN VẬT TƯ");
                 }
-                JOptionPane.showMessageDialog(null, "CẬP NHẬT LƯỢNG TỒN VẬT TƯ THÀNH CÔNG");
-                System.out.println("UPDATE = "+sql);
             }
+            GiaoDienQuanLy.updateVatTu(congTru,tbp);
+            JOptionPane.showMessageDialog(null, "CẬP NHẬT LƯỢNG TỒN VẬT TƯ THÀNH CÔNG");
+            //System.out.println("UPDATE = "+sql);
 
             JPanelHoaDon.reSetALL();
             JPanelVatTu.reSetAll();
             JPanelNhanVien.reSetAll();
-
-
+            this.dispose();
             }
         }
 
@@ -306,31 +317,31 @@ public class BillHoaDon extends JFrame implements ActionListener, KeyListener {
 
     }
 
-    class TEST_BILL {
-        public static void main(String[] args) {
-            new ConnectSQL();
-
-            String[] columnJT1 = {"STT", "MÃ VẬT TƯ", "TÊN VẬT TƯ", "SỐ LƯỢNG", "ĐƠN GIÁ", "VAT", "THÀNH TIỀN"};
-            Object[][] dataJT1 = {{1, "1000", "Xi Măng", 120, 33, 44, "434,353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-//                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
-            };
-            DefaultTableModel model = new DefaultTableModel(dataJT1, columnJT1);
-            JTable tb = new JTable(model);
-            new BillHoaDon(tb, "Nhập", "253663664", "2002", "HỒ KHÁNH AN TOAN",
-                    "20/12/2021", "25662662");
-
-            try {
-                String s = "20/12/2021";
-                System.out.println(new SimpleDateFormat("yyyy/MM/dd").parse(s));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    class TEST_BILL {
+//        public static void main(String[] args) {
+//            new ConnectSQL();
+//
+//            String[] columnJT1 = {"STT", "MÃ VẬT TƯ", "TÊN VẬT TƯ", "SỐ LƯỢNG", "ĐƠN GIÁ", "VAT", "THÀNH TIỀN"};
+//            Object[][] dataJT1 = {{1, "1000", "Xi Măng", 120, 33, 44, "434,353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+////                    {1, "77", "Xi Măng", 120, 33, 44, "353,553"},
+//            };
+//            DefaultTableModel model = new DefaultTableModel(dataJT1, columnJT1);
+//            JTable tb = new JTable(model);
+//            new BillHoaDon(tb, "Nhập", "253663664", "2002", "HỒ KHÁNH AN TOAN",
+//                    "20/12/2021", "25662662");
+//
+//            try {
+//                String s = "20/12/2021";
+//                System.out.println(new SimpleDateFormat("yyyy/MM/dd").parse(s));
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 

@@ -21,8 +21,8 @@ public class JPanelThongKe extends JPanel implements ActionListener {
     private static JLabel lbSLVatTu;
     private JLabel lbTKNhanVien;
     private static JLabel lbSLNhanVien;
-    private JLabel lbTKHoaDon;
-    private JLabel lbSLHoaDon;
+    private  JLabel lbTKHoaDon;
+    private static JLabel lbSLHoaDon;
 
     private JLabel titleTK;
     private JLabel tgBatDau;
@@ -39,13 +39,13 @@ public class JPanelThongKe extends JPanel implements ActionListener {
     private JTable tbHoaDon;
     private JPanel pnDoanhThu;
     private JTable tbDoanhThu;
-    private int inkieu = -1;
+    private int inkieu;
 
     JPanelThongKe(){
 //        this.setBackground(new Color(102, 195, 239));
         this.setBackground(new Color(255, 255, 255));
         this.setLayout(null);
-
+        inkieu=-1;
         ImageIcon iconVT = new ImageIcon(JPanelThongKe.class.getResource("book.png"));
         Image img_one = iconVT.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         lbTKVatTu = new JLabel("Vật Tư");
@@ -85,7 +85,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKNhanVien.setBounds(0, 10, 150, 100);
 
         lbSLNhanVien = new JLabel();
-        String slNhanVien = String.valueOf(JPanelNhanVien.getSoLuongNhanVien());
+        String slNhanVien = String.valueOf(GiaoDienQuanLy.getSoLuongNhanVien());
         lbSLNhanVien.setText(slNhanVien);
         lbSLNhanVien.setFont(new Font("Ubuntu", Font.BOLD, 25));
         lbSLNhanVien.setBounds(180, 20, 60, 100);
@@ -111,18 +111,8 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKHoaDon.setBounds(0, 10, 150, 100);
 
         lbSLHoaDon = new JLabel();
-        String query= "SELECT COUNT(SOHD) AS SL FROM HOADON";
-        int soLuongHD=0;
-        try {
-            PreparedStatement pre = ConnectSQL.getCon().prepareStatement(query);
-            ResultSet res = pre.executeQuery();
-            while (res.next())
-                soLuongHD=res.getInt("SL");
-            lbSLHoaDon.setText(String.valueOf(soLuongHD));
-            pre.close();
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String slHoaDon= String.valueOf(GiaoDienQuanLy.getSoLuongHoaDon());
+        lbSLHoaDon.setText(slHoaDon);
         lbSLHoaDon.setFont(new Font("Ubuntu", Font.BOLD, 25));
         lbSLHoaDon.setBounds(180, 20, 60, 100);
 
@@ -326,11 +316,26 @@ public class JPanelThongKe extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Ngày kết thúc không hợp lệ");
                 return;
             }
-                SimpleDateFormat fm1 = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat fm1 = new SimpleDateFormat("yyyy/MM/dd");
+            String timeToDay=fm1.format(Calendar.getInstance().getTime());
+            String[] arrTD = timeToDay.split("/");
             String timebd = fm1.format(datebd.getDate());
             String[] arrBD=timebd.split("/");
             String timekt = fm1.format(datekt.getDate());
             String[] arrKT = timekt.split("/");
+            for (int i=0;i<arrBD.length;++i){
+                if (Integer.parseInt(arrBD[i])>Integer.parseInt(arrTD[i])){
+                    JOptionPane.showMessageDialog(null, "Thời gian bắt đầu không được lớn hơn thời gian hiện tại!");
+                    return;
+                }else if (Integer.parseInt(arrBD[i])<Integer.parseInt(arrTD[i])) break;
+            }
+            for (int i=0;i<arrKT.length;++i){
+                if (Integer.parseInt(arrKT[i])>Integer.parseInt(arrTD[i])){
+                    JOptionPane.showMessageDialog(null, "Thời gian kết thúc không được lớn hơn thời gian hiện tại!");
+                    return;
+                }else if (Integer.parseInt(arrKT[i])<Integer.parseInt(arrTD[i])) break;
+            }
+
             for (int i=0;i<arrBD.length;++i){
                 if (Integer.parseInt(arrKT[i])-Integer.parseInt(arrBD[i])<0){
                     JOptionPane.showMessageDialog(null, "Thời gian bắt đầu không được lớn hơn thời gian kết thúc");
@@ -348,50 +353,54 @@ public class JPanelThongKe extends JPanel implements ActionListener {
             if(inkieu == 1){
                 pnDoanhThu.setVisible(false);
                 pnHoaDon.setVisible(true);
-                String sql = "SELECT * FROM HOADON AS HD, (SELECT CTHOADON.SoHD, NV.HoNV, NV.TenNV, " +
-                        "SUM(CTHOADON.DonGia * CTHOADON.SoLuong *(CTHOADON.Vat / 100 + 1)) AS TONG FROM CTHOADON, NHANVIEN AS NV " +
-                "WHERE CTHOADON.MaNV = NV.MaNV "+
-                "GROUP BY SoHD, NV.HoNV, NV.TenNV) AS CT " +
-                "WHERE HD.SoHD = CT.SoHD AND HD.NgayLap BETWEEN '" + time_one +"' AND '"+ timetwo +"'" + " ORDER BY HD.NgayLap";
-                //System.out.println("SQL = "+sql);
+//                String sql = "SELECT * FROM HOADON AS HD, (SELECT CTHOADON.SoHD, NV.HoNV, NV.TenNV, " +
+//                        "SUM(CTHOADON.DonGia * CTHOADON.SoLuong *(CTHOADON.Vat / 100 + 1)) AS TONG FROM CTHOADON, NHANVIEN AS NV " +
+//                "WHERE CTHOADON.MaNV = NV.MaNV "+
+//                "GROUP BY SoHD, NV.HoNV, NV.TenNV) AS CT " +
+//                "WHERE HD.SoHD = CT.SoHD AND HD.NgayLap BETWEEN '" + time_one +"' AND '"+ timetwo +"'" + " ORDER BY HD.NgayLap";
+//                //System.out.println("SQL = "+sql);
                 modelHD.setRowCount(0);
-                try {
-                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                    ResultSet rs = pre.executeQuery();
-                    int stt = 1;
-                    while (rs.next()) {
-                        modelHD.addRow(new Object[]{stt, rs.getInt("SoHD"), rs.getDate("NgayLap"),
-                                rs.getString("Loai"), rs.getString("HoNV") + " "+  rs.getString("TenNV"),
-                                ChuanHoa.ChuyenSoThanhTien(String.valueOf(rs.getInt("Tong")))});
-                        stt ++;
-                    }
-                    pre.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                //System.out.println("cham hoi");
+//                String[] columnJT = {"STT", "Số HD", "NGÀY LẬP", "LOẠI HD", "NHÂN VIÊN LẬP", "TRỊ GIÁ HD"};
+                GiaoDienQuanLy.napModelThongKeHoaDon(modelHD, time_one, timetwo);
+//                try {
+//                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
+//                    ResultSet rs = pre.executeQuery();
+//                    int stt = 1;
+//                    while (rs.next()) {
+//                        modelHD.addRow(new Object[]{stt, rs.getInt("SoHD"), rs.getDate("NgayLap"),
+//                                rs.getString("Loai"), rs.getString("HoNV") + " "+  rs.getString("TenNV"),
+//                                ChuanHoa.ChuyenSoThanhTien(String.valueOf(rs.getInt("Tong")))});
+//                        stt ++;
+//                    }
+//                    pre.close();
+//                } catch (SQLException ex) {
+//                    ex.printStackTrace();
+//                }
             }
             if(inkieu == 2){
                 pnHoaDon.setVisible(false);
                 pnDoanhThu.setVisible(true);
-                String sql = "SELECT TOP 10 VT.MaVT, VT.TenVT, SUM(CT.SoLuong) AS SLBAN, SUM((CT.DonGia * CT.SoLuong) * (CT.Vat / 100 + 1)) AS TONG FROM CTHOADON AS CT, HOADON AS HD, VATTU AS VT\n" +
-                        "WHERE CT.SoHD = HD.SoHD AND HD.Loai = 'X' AND" +
-                        " CT.MaVT = VT.MaVT AND HD.NgayLap BETWEEN '"+time_one+"' AND '"+timetwo+"'" +
-                        "GROUP BY VT.MaVT, VT.TenVT ORDER BY TONG DESC" ;
-                //System.out.println("SQL = "+sql);
+//                String sql = "SELECT TOP 10 VT.MaVT, VT.TenVT, SUM(CT.SoLuong) AS SLBAN, SUM((CT.DonGia * CT.SoLuong) * (CT.Vat / 100 + 1)) AS TONG FROM CTHOADON AS CT, HOADON AS HD, VATTU AS VT\n" +
+//                        "WHERE CT.SoHD = HD.SoHD AND HD.Loai = 'X' AND" +
+//                        " CT.MaVT = VT.MaVT AND HD.NgayLap BETWEEN '"+time_one+"' AND '"+timetwo+"'" +
+//                        "GROUP BY VT.MaVT, VT.TenVT ORDER BY TONG DESC" ;
+//                //System.out.println("SQL = "+sql);
                 modelDT.setRowCount(0);
-                try {
-                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
-                    ResultSet rs = pre.executeQuery();
-                    int stt = 1;
-                    while (rs.next()) {
-                        modelDT.addRow(new Object[]{stt, rs.getString("MAVT"), rs.getString("TENVT"),
-                                rs.getInt("SLBAN"), ChuanHoa.ChuyenSoThanhTien(String.valueOf(rs.getInt("TONG")))});
-                        stt ++;
-                    }
-                    pre.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                GiaoDienQuanLy.napModelTop(modelDT,time_one,timetwo);
+//                try {
+//                    PreparedStatement pre = ConnectSQL.getCon().prepareStatement(sql);
+//                    ResultSet rs = pre.executeQuery();
+//                    int stt = 1;
+//                    while (rs.next()) {
+//                        modelDT.addRow(new Object[]{stt, rs.getString("MAVT"), rs.getString("TENVT"),
+//                                rs.getInt("SLBAN"), ChuanHoa.ChuyenSoThanhTien(String.valueOf(rs.getInt("TONG")))});
+//                        stt ++;
+//                    }
+//                    pre.close();
+//                } catch (SQLException ex) {
+//                    ex.printStackTrace();
+//                }
             }
         }
     }
@@ -402,5 +411,9 @@ public class JPanelThongKe extends JPanel implements ActionListener {
     public static void setSoLuongNV(int soLuong){
         String slNhanVien = String.valueOf(soLuong);
         lbSLNhanVien.setText(slNhanVien);
+    }
+    public static void setSoLuongHD(int SoLuong){
+        String slHoaDon = String.valueOf(SoLuong);
+        lbSLHoaDon.setText(slHoaDon);
     }
 }

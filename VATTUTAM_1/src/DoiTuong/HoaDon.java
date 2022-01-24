@@ -45,6 +45,13 @@ public class HoaDon {
     public ArrayList<ChiTietHoaDon> getChiTietHoaDon(){
         return new ArrayList<>(chiTiet);
     }
+    public double getTriGia(){
+        double triGia=0;
+        for (ChiTietHoaDon chiTietHoaDon: chiTiet){
+            triGia+= chiTietHoaDon.getTong();
+        }
+        return triGia;
+    }
     public void setSoHoaDon(String soHoaDon) {
         this.soHoaDon = soHoaDon;
     }

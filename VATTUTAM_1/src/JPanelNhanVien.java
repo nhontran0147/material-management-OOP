@@ -44,7 +44,6 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
     public JPanelNhanVien() {
         this.setBackground(new Color(255, 255, 255));
         this.setLayout(null);
-
         topContainer = new JPanel();
         topContainer.setLayout(null);
         topContainer.setBounds(10, 10, 980, 270);
@@ -161,7 +160,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btnresetNV.setIconTextGap(10);
 
 
-        String[] columnJT = {"STT", "MANV", "HONV", "TENNV", "PHAI", "TRANG THAI"};
+        String[] columnJT = {"STT", "MÃ SỐ", "HỌ & TÊN LÓT", "TÊN", "PHÁI", "TRẠNG THÁI"};
         String[][] dataJT = {};
         model = new DefaultTableModel(dataJT, columnJT);
         tbnhanvien = new JTable(model);
@@ -262,7 +261,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
     public void mouseClicked(MouseEvent e) {
 
         if(e.getSource() == btnaddNV){
-            if (Login.getQuyenHanh()==0){
+            if (Login.getQuyenHanh()!=2){
                 JOptionPane.showMessageDialog(null,"Bạn không có quyền thêm nhân viên!");
                 return;
             }
@@ -301,7 +300,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         }
 
         if(e.getSource() == btneditNV){
-            if (Login.getQuyenHanh()==0){
+            if (Login.getQuyenHanh()!=2){
                 JOptionPane.showMessageDialog(null,"Bạn không có quyền sửa thông tin nhân viên!");
                 return;
             }
@@ -320,7 +319,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         }
 
         if(e.getSource() == btnremoveNV){
-            if (Login.getQuyenHanh()==0){
+            if (Login.getQuyenHanh()!=2){
                 JOptionPane.showMessageDialog(null,"Bạn không có quyền xóa nhân viên!");
                 return;
             }

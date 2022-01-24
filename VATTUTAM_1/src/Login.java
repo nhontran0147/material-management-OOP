@@ -126,15 +126,6 @@ public class Login extends JFrame implements ActionListener, KeyListener {
             JOptionPane.showMessageDialog(null, "Đăng nhập thành công");
             this.dispose();
             new GiaoDienQuanLy();
-            ArrayList<NhanVien> nhanVienArrayList= GiaoDienQuanLy.getNhanVienArrayList();
-            for (NhanVien nhanVien:nhanVienArrayList){
-                if (nhanVien.getMaNhanVien().equals(MaNV)){
-                    HoNV = nhanVien.getHoNhanVien();
-                    TenNV = nhanVien.getTenNhanVien();
-                    PhaiNV = nhanVien.getPhaiNhanVien();
-                    break;
-                }
-            }
         }
     }
 
@@ -145,12 +136,20 @@ public class Login extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if (e.getSource() == txtPassword){
+            if (e.getKeyCode()==0){
+                JOptionPane.showMessageDialog(null,"Vui lòng tắt bộ gõ tiếng Việt và nhập lại từ đầu!!!");
+                txtPassword.setText("");
+            }
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (e.getKeyCode()==32){
+            JOptionPane.showMessageDialog(null,"Mật khẩu không nhận kí tự space!");
+            txtPassword.setText(txtPassword.getText().substring(0,txtPassword.getText().length()-1));
+        }
     }
 
     public static String getUserName() {
@@ -161,8 +160,8 @@ public class Login extends JFrame implements ActionListener, KeyListener {
         return quyenHanh;
     }
 
-    public static String[] ObjNhanVien (){
-        return new String[] {String.valueOf(MaNV), HoNV, TenNV, PhaiNV};
+    public static NhanVien getThongTinNhanVien(){
+        return new NhanVien(MaNV, HoNV, TenNV, PhaiNV,true);
     }
 
     public static String getMaNV() {

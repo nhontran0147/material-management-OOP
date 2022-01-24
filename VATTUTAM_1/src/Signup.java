@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-public class Signup extends JFrame implements ActionListener, KeyListener {
+public class Signup extends JDialog implements ActionListener, KeyListener {
     private final int WIDTH_LOGIN = 400;
     private final int HEIGHT_LOGIN = 450;
     private JPanel JPmain;
@@ -31,7 +31,7 @@ public class Signup extends JFrame implements ActionListener, KeyListener {
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.con = new ConnectSQL().getCon();
-
+        this.setModal(true);
         JPmain = new JPanel();
         JPmain.setBounds(0, 0, WIDTH_LOGIN, HEIGHT_LOGIN);
         JPmain.setLayout(null);
@@ -228,7 +228,10 @@ public class Signup extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (e.getKeyCode()==32){
+            JOptionPane.showMessageDialog(null,"Mật khẩu không nhận kí tự space!");
+            txtPassword.setText(txtPassword.getText().substring(0,txtPassword.getText().length()-1));
+        }
     }
 
     public static void main(String[] args) {

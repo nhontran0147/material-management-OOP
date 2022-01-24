@@ -13,7 +13,12 @@ public class VatTu {
         this.soLuongTon = soLuongTon;
         this.donViTinh = donViTinh;
     }
-
+    public void addSoLuongTon(int soLuongTon){
+        this.soLuongTon+=soLuongTon;
+    }
+    public void decSoLuongTon(int soLuongTon){
+        this.soLuongTon-=soLuongTon;
+    }
     public void setSoLuongTon(int soLuongTon) {
         this.soLuongTon = soLuongTon;
     }

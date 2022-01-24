@@ -4,10 +4,10 @@ public class ChiTietHoaDon {
     private String soHoaDon;
     private String maVatTu;
     private int soLuong;
-    private int vat;
+    private float vat;
     private int donGia;
 
-    public ChiTietHoaDon(String soHoaDon, String maVatTu, int soLuong, int donGia, int vat){
+    public ChiTietHoaDon(String soHoaDon, String maVatTu, int soLuong, int donGia, float vat){
         this.soHoaDon=soHoaDon;
         this.maVatTu=maVatTu;
         this.soLuong=soLuong;
@@ -27,7 +27,7 @@ public class ChiTietHoaDon {
         this.soLuong = soLuong;
     }
 
-    public void setVat(int vat) {
+    public void setVat(float vat) {
         this.vat = vat;
     }
 
@@ -44,11 +44,15 @@ public class ChiTietHoaDon {
         return soLuong;
     }
 
-    public int getVat() {
+    public float getVat() {
         return vat;
     }
 
     public Object[] toObjects(){
         return new Object[] {soHoaDon, donGia, maVatTu, soLuong, vat};
+    }
+    public double getTong(){
+        double tong=(double) soLuong*(double)donGia*(vat/100.0+1);
+        return tong;
     }
 }

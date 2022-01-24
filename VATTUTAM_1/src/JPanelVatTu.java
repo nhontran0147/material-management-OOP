@@ -39,6 +39,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
     private static boolean danglapHD_VT = false;
     private static int soLuongVatTu=0;
     public JPanelVatTu() {
+        //System.out.println("toi duoc lam lai");
         this.setBackground(new Color(255, 255, 255));
         this.setLayout(null);
 
@@ -100,9 +101,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         Object[][] dataJT = {};
         model = new DefaultTableModel(dataJT, columnJT);
         tbvattu = new JTable(model);
-
-        GiaoDienQuanLy.setModelVatTu(model);
-
+        GiaoDienQuanLy.setModelVatTu(model,true);
         tbvattu.setFillsViewportHeight(true);
         tbvattu.setBackground(new Color(248, 249, 250));
         tbvattu.setOpaque(true);
@@ -135,7 +134,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         tbvattu.setDefaultEditor(Object.class, null); // Không cho edit table
         tbvattu.getColumnModel().getColumn(0).setMaxWidth(70);
         tbvattu.getColumnModel().getColumn(0).setPreferredWidth(70);
-
         // Get row and value click
         tbvattu.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
@@ -255,7 +253,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
     public static void upDateList() {
         model.setRowCount(0);
-        GiaoDienQuanLy.setModelVatTu(model);
+        GiaoDienQuanLy.setModelVatTu(model,true);
     }
     @Override
     public void keyTyped(KeyEvent e) {
@@ -358,6 +356,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
 
         if (e.getSource() == btnremoveVT) {
+
             if (Login.getQuyenHanh()==0){
                 JOptionPane.showMessageDialog(null,"Bạn không có quyền xóa vật tư!");
                 return;

@@ -6,8 +6,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import ThaoTacChuoi.ChuyenDoiXau;
 
 // SQL Sai kiểu dữ liệu
 // Xóa thì cho null
@@ -223,13 +225,6 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getSource() == this){
-            System.out.println("dang bam");
-            System.out.println(Signup.getCheckSignup());
-            if (Signup.getCheckSignup())
-                JOptionPane.showMessageDialog(null,"Vui lòng hoàn thành thao tác đăng kí tài khoản!");
-                return;
-        }
         if (e.getSource() == lb01) {
             tbp01.setSelectedIndex(0);
 
@@ -237,16 +232,21 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         } else if (e.getSource() == lb02) {
             tbp01.setSelectedIndex(1);
         } else if (e.getSource() == lb03) {
+            JPanelHoaDon.upDateListVatTu();
             tbp01.setSelectedIndex(2);
         } else if (e.getSource() == lb031) {
-        //    JPanelThongKe.setSoLuongVT(JPanelVatTu.getSoLuongVatTu());
-            JPanelThongKe.setSoLuongNV(JPanelNhanVien.getSoLuongNhanVien());
+           JPanelThongKe.setSoLuongVT(getSoLuongVatTu());
+           JPanelThongKe.setSoLuongNV(getSoLuongNhanVien());
+           JPanelThongKe.setSoLuongHD(getSoLuongHoaDon());
             tbp01.setSelectedIndex(3);
         }else if(e.getSource() == lb032){
             if (!Signup.getCheckSignup())
                 new Signup();
         } else if(e.getSource() == logout){ // LOGOUT
             this.dispose();
+            JPanelVatTu.setMaVTValueSelected(null);
+            JPanelNhanVien.setMaNVValueSelected(null);
+           // JPanelHoaDon.setManvchoosed(null);
             new Login();
         }
     }
@@ -320,7 +320,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             e.printStackTrace();
         }
         for (int i=0;i<nhanVienArrayList.size();++i){
-            String queryHoaDon = "SELECT * FROM HOADON WHERE MANV LIKE '" + nhanVienArrayList.get(i).getMaNhanVien() + "'";
+            String queryHoaDon = "SELECT * FROM HOADON WHERE MANV LIKE '" + nhanVienArrayList.get(i).getMaNhanVien() + "' ORDER BY NgayLap";
             try {
                 PreparedStatement pre = con.prepareStatement(queryHoaDon);
                 ResultSet rs = pre.executeQuery();
@@ -338,6 +338,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
+                   // System.out.println(String.valueOf(hoaDon.getNgayLap())+"hehe");
                     nhanVienArrayList.get(i).addHoaDon(hoaDon);
                 }
                 pre.close();
@@ -436,7 +437,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     JPanelVatTu.setThongBao("Bạn chưa chọn vật tư nào");
                     JPanelHoaDon.setVatTuNameSelected(null);
                     JPanelHoaDon.setVatTuValueSelected(null);
-                    JPanelHoaDon.setMavtchoosed("NULL");
+                   // JPanelHoaDon.setMavtchoosed("NULL");
                     JOptionPane.showMessageDialog(null, "Chỉnh sửa vật tư thành công");
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -445,12 +446,19 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             }
         }
     }
-    public static void setModelVatTu(DefaultTableModel model){
-        int stt=1;
-        for (VatTu vatTuTemp: vatTuArrayList){
-            model.addRow(vatTuTemp.toObjectsSTT(stt));
-            stt++;
+    public static void setModelVatTu(DefaultTableModel model,boolean kieu){
+        if (kieu){
+            int stt=1;
+            for (VatTu vatTuTemp: vatTuArrayList){
+                model.addRow(vatTuTemp.toObjectsSTT(stt));
+                stt++;
+            }
+        }else{
+            for (VatTu vatTuTemp: vatTuArrayList){
+                model.addRow(vatTuTemp.toObjects());
+            }
         }
+
     }
     public static boolean checkVatTuDaTonTai(String maVatTu){
         for (VatTu vatTu: vatTuArrayList){
@@ -461,6 +469,16 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
     }
     public static int getSoLuongVatTu(){
         return vatTuArrayList.size();
+    }
+    public static int getSoLuongHoaDon(){
+        int sum=0;
+        for(NhanVien nhanVien: nhanVienArrayList){
+            sum+=nhanVien.getSoLuongHoaDon();
+        }
+        return sum;
+    }
+    public static int getSoLuongNhanVien(){
+        return nhanVienArrayList.size();
     }
     public static void changeModelNhanVien(DefaultTableModel model){
         int stt=1;
@@ -521,10 +539,10 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     JOptionPane.showMessageDialog(null, "Chỉnh sửa nhân viên thành công");
                     nhanVienArrayList.sort(Comparator.comparing(staff -> ((NhanVien)staff).getTenNhanVienKhongDau()).thenComparing(staff -> ((NhanVien)staff).getHoNhanVienKhongDau()));
                     JPanelNhanVien.updateList();
-                    JPanelHoaDon.upDateListNhanVien();
+//                    JPanelHoaDon.upDateListNhanVien();
                     JPanelNhanVien.setThongBao("Bạn chưa chọn nhân viên nào");
-                    JPanelHoaDon.setNhanVienValueSelected(null);
-                    JPanelHoaDon.setManvchoosed("NULL");
+//                    JPanelHoaDon.setNhanVienValueSelected(null);
+                //    JPanelHoaDon.setManvchoosed("NULL");
                     return;
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -561,10 +579,10 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     stmt.close();
                     JPanelNhanVien.setMaNVValueSelected(null);
                     JPanelNhanVien.updateList();
-                    JPanelHoaDon.upDateListNhanVien();
+//                    JPanelHoaDon.upDateListNhanVien();
                     JPanelNhanVien.setThongBao("Bạn chưa chọn nhân viên nào");
-                    JPanelHoaDon.setNhanVienValueSelected(null);
-                    JPanelHoaDon.setManvchoosed("NULL");
+                    //JPanelHoaDon.setNhanVienValueSelected(null);
+                 //   JPanelHoaDon.setManvchoosed("NULL");
                     return;
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -575,12 +593,13 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
     public static void delNhanVien(String maNhanVien){
         for (User user: userArrayList){
             if(user.getUserName().equals(maNhanVien)){
-                String sql = "DELETE FROM USERS WHERE MANV LIKE '" + user.getUserName() + "'";
+                String sql = "DELETE FROM USERS WHERE USERNAME LIKE '" + user.getUserName() + "'";
                 try{
                     PreparedStatement pre = con.prepareStatement(sql);
                     pre.executeUpdate();
                     pre.close();
                     userArrayList.remove(user);
+                    break;
                 }catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -594,9 +613,9 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     pre.executeUpdate();
                     pre.close();
                     nhanVienArrayList.remove(nhanVien);
-                    JPanelHoaDon.setNhanVienValueSelected(null);
-                    JPanelHoaDon.setManvchoosed("NULL");
-                    JPanelHoaDon.upDateListNhanVien();
+                  //  JPanelHoaDon.setNhanVienValueSelected(null);
+                  //  JPanelHoaDon.setManvchoosed("NULL");
+//                    JPanelHoaDon.upDateListNhanVien();
                     return;
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -621,6 +640,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
                     PreparedStatement pre = con.prepareStatement(sql);
                     pre.executeUpdate();
                     pre.close();
+                    return;
                 }catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -641,6 +661,102 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Lỗi tạo tài khoản");
             ex.printStackTrace();
+        }
+    }
+    public static boolean soSanhThoiGian(String timeBD,String ngLap){
+        String[] arrBD = timeBD.split("/");
+        String[] arrNL = ngLap.split("/");
+        for (int i=0;i<arrBD.length;++i){
+            if (Integer.parseInt(arrBD[i]) < Integer.parseInt(arrNL[i]))
+                return true;
+            else if(Integer.parseInt(arrBD[i]) > Integer.parseInt(arrNL[i])) return false;
+        }
+        return true;
+    }
+    public static void napModelThongKeHoaDon(DefaultTableModel model,String timeBD,String timeKT){
+        ArrayList<HoTroHD> hoaDonArrayList = new ArrayList<>();
+        for (NhanVien nhanVien: nhanVienArrayList){
+            for (HoaDon hoaDon: nhanVien.getHoaDonArrayList()){
+                SimpleDateFormat fm = new SimpleDateFormat("yyyy/MM/dd");
+                String ngLap = fm.format(hoaDon.getNgayLap());
+                if (soSanhThoiGian(timeBD,ngLap) && soSanhThoiGian(ngLap,timeKT))
+                    hoaDonArrayList.add(new HoTroHD(hoaDon.getSoHoaDon(),hoaDon.getNgayLap(),hoaDon.getLoaiHoaDon(),nhanVien.getHoNhanVien()+" "+nhanVien.getTenNhanVien(),hoaDon.getTriGia()));
+            }
+        }
+        hoaDonArrayList.sort(Comparator.comparing(staff ->((HoTroHD)staff).getNgayLap()).thenComparing(staff -> ((HoTroHD)staff).getSoHoaDon()));
+        int stt=1;
+        for (HoTroHD hoTroHD: hoaDonArrayList){
+            model.addRow(hoTroHD.toObjects(stt));
+            stt++;
+        }
+    }
+    public static void napModelTop(DefaultTableModel model,String timeBD, String timeKT){
+        ArrayList<HoTroTop> hoTroTopArrayList = new ArrayList<>();
+        for (VatTu vatTu: vatTuArrayList){
+            hoTroTopArrayList.add(new HoTroTop(vatTu.getMaVatTu(),vatTu.getTenVatTu(),0,0));
+        }
+        for (NhanVien nhanVien: nhanVienArrayList){
+            for (HoaDon hoaDon: nhanVien.getHoaDonArrayList()){
+                SimpleDateFormat fm = new SimpleDateFormat("yyyy/MM/dd");
+                String ngLap = fm.format(hoaDon.getNgayLap());
+                if (soSanhThoiGian(timeBD,ngLap) && soSanhThoiGian(ngLap,timeKT) && hoaDon.getLoaiHoaDon().equals("X")){
+                    for (ChiTietHoaDon chiTietHoaDon: hoaDon.getChiTietHoaDon()){
+                        for(HoTroTop hoTroTop:hoTroTopArrayList){
+                            if (chiTietHoaDon.getMaVatTu().equals(hoTroTop.getMaVatTu())){
+                                hoTroTop.addSoLuong(chiTietHoaDon.getSoLuong());
+                                hoTroTop.addTienThu(chiTietHoaDon.getTong());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        hoTroTopArrayList.sort(Comparator.comparing(staff ->((HoTroTop)staff).getTienThu()).reversed());
+        int stt=1;
+        int dem=0;
+        while(stt<=10 && dem<hoTroTopArrayList.size() && hoTroTopArrayList.get(dem).getTienThu()>0){
+            model.addRow(hoTroTopArrayList.get(dem).toObjects(stt));
+            stt++;
+            dem++;
+        }
+    }
+    public static NhanVien getThongTinNhanVienlap(){
+        String maNV=Login.getUserName();
+        int vt=0;
+        for (int i=0;i<nhanVienArrayList.size();++i){
+            if(nhanVienArrayList.get(i).getMaNhanVien().equals(maNV)){
+                vt=i;
+                break;
+            }
+        }
+        return nhanVienArrayList.get(vt);
+    }
+    public static void napModelTimKiem(DefaultTableModel model, String timKiem){
+        timKiem=timKiem.toLowerCase();
+        for (VatTu vatTu: vatTuArrayList){
+            if (vatTu.getMaVatTu().contains(timKiem) || vatTu.getTenVatTu().toLowerCase().contains(timKiem))
+                model.addRow(vatTu.toObjects());
+        }
+    }
+    public static void addHoaDon(String maNV,HoaDon hoaDon){
+        for(NhanVien nhanVien:nhanVienArrayList){
+            if (nhanVien.getMaNhanVien().equals(maNV)){
+                nhanVien.addHoaDon(hoaDon);
+                break;
+            }
+        }
+    }
+    public static void updateVatTu(String congTru,JTable tbp){
+        for(int i=0;i<tbp.getRowCount();++i){
+            for(VatTu vatTu:vatTuArrayList){
+                if(vatTu.getMaVatTu().equals(tbp.getValueAt(i,1).toString())){
+                    if (congTru=="+"){
+                        vatTu.addSoLuongTon(Integer.parseInt(tbp.getValueAt(i,3).toString()));
+                    }else vatTu.decSoLuongTon(Integer.parseInt(tbp.getValueAt(i,3).toString()));
+                    break;
+                }
+            }
         }
     }
 
@@ -672,8 +788,8 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
     private JLabel logout;
 }
 
-class TESTPRO {
-    public static void main(String[] args) {
-        new GiaoDienQuanLy();
-    }
-}
+//class TESTPRO {
+//    public static void main(String[] args) {
+//        new GiaoDienQuanLy();
+//    }
+//}

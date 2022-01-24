@@ -117,12 +117,15 @@ public class EditHoaDon extends JFrame implements ActionListener, KeyListener {
         txtVat.setText(Vat);
         txtSoLuong.setText(SoLuong);
         txtDonGia.setText(DonGia);
-
+        txtSoLuong.addKeyListener(this);
+        txtDonGia.addKeyListener(this);
+        txtVat.addKeyListener(this);
         this.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent e){
                 dangEdit = 0;
             }
         });
+
 
         this.add(JPmain);
         this.addKeyListener(this);
@@ -157,7 +160,27 @@ public class EditHoaDon extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if (e.getSource()==txtSoLuong){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtSoLuong.getText().length()<6) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtSoLuong.setEditable(true);
+            } else {
+                txtSoLuong.setEditable(false);
+            }
+        }
+        if (e.getSource()==txtDonGia){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtDonGia.getText().length()<9) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtDonGia.setEditable(true);
+            } else {
+                txtDonGia.setEditable(false);
+            }
+        }
+        if (e.getSource()==txtVat){
+            if ((e.getKeyChar() >= '0' && e.getKeyChar() <= '9' && txtVat.getText().length()<2) || e.getKeyCode() == 8 || e.getKeyCode()==127) {
+                txtVat.setEditable(true);
+            } else {
+                txtVat.setEditable(false);
+            }
+        }
     }
 
     @Override
