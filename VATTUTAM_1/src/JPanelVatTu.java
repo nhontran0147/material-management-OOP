@@ -77,7 +77,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         txtsoluongton.setBounds(650, 50, 180, 30);
         txtsoluongton.setBackground(new Color(105, 121, 141));
         txtsoluongton.setFont(new Font("Ubuntu", Font.PLAIN, 16));
-        txtsoluongton.setForeground(new Color(255, 255, 255));
+        txtsoluongton.setForeground(new Color(255, 179, 14));
         txtsoluongton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Set padding
 
         lbdonvi = new JLabel("ĐƠN VỊ TÍNH: ");
@@ -153,7 +153,6 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         txtmavt.addKeyListener(this);
         txtmavt.addMouseListener(this);
         txtsoluongton.addKeyListener(this);
-
         btnaddVT = new JLabel("THÊM VẬT TƯ");
         btnaddVT.setBounds(150, 200, 140, 40);
         btnaddVT.setBackground(new Color(22, 114, 236));
@@ -163,7 +162,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("add.png"));
         Image image_add = add_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         add_icon.setImage(image_add);
-        btnaddVT.setIcon(add_icon);
+        btnaddVT.setIcon(new NoScalingIcon(add_icon));
         btnaddVT.setIconTextGap(10);
 
         btneditVT = new JLabel("CHỈNH SỬA");
@@ -175,7 +174,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("edit.png"));
         Image image_edit = edit_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         edit_icon.setImage(image_edit);
-        btneditVT.setIcon(edit_icon);
+        btneditVT.setIcon(new NoScalingIcon(edit_icon));
         btneditVT.setIconTextGap(10);
 
 
@@ -188,7 +187,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("remove.png"));
         Image image_remove = remove_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         remove_icon.setImage(image_remove);
-        btnremoveVT.setIcon(remove_icon);
+        btnremoveVT.setIcon(new NoScalingIcon(remove_icon));
         btnremoveVT.setIconTextGap(10);
 
         btnresetVT = new JLabel("RESET INPUT");
@@ -200,7 +199,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
         Image image_reset = reset_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         reset_icon.setImage(image_reset);
-        btnresetVT.setIcon(reset_icon);
+        btnresetVT.setIcon(new NoScalingIcon(reset_icon));
         btnresetVT.setIconTextGap(10);
 
         topContainer.add(btnaddVT);
@@ -222,7 +221,8 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btneditVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnresetVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnremoveVT.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
+        txtsoluongton.setText("0");
+        txtsoluongton.setEditable(false);
         topContainer.add(lbmavt);
         topContainer.add(lbdonvi);
         topContainer.add(lbsoluongton);
@@ -276,13 +276,13 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
                 txttenvt.setEditable(true);
             }else txttenvt.setEditable(false);
         }
-
-        if (e.getSource() == txtsoluongton){
-
-            if ((((e.getKeyChar()>='1' && e.getKeyChar()<='9') || (e.getKeyChar()=='0' && txtsoluongton.getText().length()>0)) && txtsoluongton.getText().length()<9) || e.getKeyCode()==8 || e.getKeyCode()==127)
-                txtsoluongton.setEditable(true);
-            else txtsoluongton.setEditable(false);
-        }
+//
+//        if (e.getSource() == txtsoluongton){
+//
+////            if ((((e.getKeyChar()>='1' && e.getKeyChar()<='9') || (e.getKeyChar()=='0' && txtsoluongton.getText().length()>0)) && txtsoluongton.getText().length()<9) || e.getKeyCode()==8 || e.getKeyCode()==127)
+////                txtsoluongton.setEditable(true);
+////            else txtsoluongton.setEditable(false);
+//        }
 
         if (e.getSource() == txtdonvi){
             if ((((e.getKeyCode()>=65 && e.getKeyCode()<=90) || e.getKeyCode()==0
@@ -346,8 +346,9 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
 
         if (e.getSource() == btnresetVT) {
             upDateList();
+
             lbthongbao.setText("Bạn chưa chọn vật tư nào");
-            txtsoluongton.setText("");
+            txtsoluongton.setText("0");
             txttenvt.setText("");
             txtdonvi.setText("");
             txtmavt.setText("");
@@ -372,6 +373,10 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
             }
             if (GiaoDienQuanLy.isVatTuInHoaDon(maVTValueSelected)) {
                 JOptionPane.showMessageDialog(null, "Không thể xóa vì vật tư này đã tồn tại trong hóa đơn nhập/xuất!");
+                return;
+            }
+            if (Integer.parseInt(soLuongSelected)!=0){
+                JOptionPane.showMessageDialog(null,"Số lượng tồn của vật tư này lớn hơn 0 nên không thể xóa trực tiếp!");
                 return;
             }
             int choose = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn xóa vật tư: " + maVTValueSelected);

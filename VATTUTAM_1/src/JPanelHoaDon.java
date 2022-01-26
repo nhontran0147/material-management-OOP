@@ -328,7 +328,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("add.png"));
         Image image_add = add_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         add_icon.setImage(image_add);
-        btnaddHD.setIcon(add_icon);
+        btnaddHD.setIcon(new NoScalingIcon(add_icon));
         btnaddHD.setIconTextGap(10);
 
         btneditHD = new JLabel("CHỈNH SỬA");
@@ -340,7 +340,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("edit.png"));
         Image image_edit = edit_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         edit_icon.setImage(image_edit);
-        btneditHD.setIcon(edit_icon);
+        btneditHD.setIcon(new NoScalingIcon(edit_icon));
         btneditHD.setIconTextGap(10);
 
 
@@ -353,7 +353,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("remove.png"));
         Image image_remove = remove_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         remove_icon.setImage(image_remove);
-        btnremoveHD.setIcon(remove_icon);
+        btnremoveHD.setIcon(new NoScalingIcon(remove_icon));
         btnremoveHD.setIconTextGap(10);
 
         btnresetHD = new JLabel("RESET INPUT");
@@ -365,7 +365,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
         Image image_reset = reset_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         reset_icon.setImage(image_reset);
-        btnresetHD.setIcon(reset_icon);
+        btnresetHD.setIcon(new NoScalingIcon(reset_icon));
         btnresetHD.setIconTextGap(10);
 
         btnsaveHD = new JLabel("LƯU VÀ IN");
@@ -377,7 +377,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         ImageIcon save_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
         Image image_save = save_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         save_icon.setImage(image_save);
-        btnsaveHD.setIcon(save_icon);
+        btnsaveHD.setIcon(new NoScalingIcon(save_icon));
         btnsaveHD.setIconTextGap(10);
 
 

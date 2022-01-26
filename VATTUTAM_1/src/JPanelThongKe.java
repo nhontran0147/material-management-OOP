@@ -55,7 +55,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKVatTu.setFont(new Font("Ubuntu", Font.BOLD, 12));
         lbTKVatTu.setForeground(new Color(255,255,255));
         iconVT.setImage(img_one);
-        lbTKVatTu.setIcon(iconVT);
+        lbTKVatTu.setIcon(new NoScalingIcon(iconVT));
         lbTKVatTu.setBounds(0, 10, 150, 100);
 
         lbSLVatTu = new JLabel();
@@ -81,7 +81,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKNhanVien.setFont(new Font("Ubuntu", Font.BOLD, 12));
         lbTKNhanVien.setForeground(new Color(255,255,255));
         iconNV.setImage(img_two);
-        lbTKNhanVien.setIcon(iconNV);
+        lbTKNhanVien.setIcon(new NoScalingIcon(iconNV));
         lbTKNhanVien.setBounds(0, 10, 150, 100);
 
         lbSLNhanVien = new JLabel();
@@ -107,7 +107,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         lbTKHoaDon.setFont(new Font("Ubuntu", Font.BOLD, 12));
         lbTKHoaDon.setForeground(new Color(255,255,255));
         iconHD.setImage(img_three);
-        lbTKHoaDon.setIcon(iconHD);
+        lbTKHoaDon.setIcon(new NoScalingIcon(iconHD));
         lbTKHoaDon.setBounds(0, 10, 150, 100);
 
         lbSLHoaDon = new JLabel();
