@@ -234,10 +234,3 @@ public class EditNhanVien extends JDialog implements ActionListener, KeyListener
         return checkEditNhanVien;
     }
 }
-
-class TESTMAINNHE222 {
-    public static void main(String[] args) {
-        new EditNhanVien("2001", "Xi Măng", "Bao", "2000");
-    }
-}
-

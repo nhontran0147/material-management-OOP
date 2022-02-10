@@ -325,7 +325,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         btnaddHD.setOpaque(true);
         btnaddHD.setForeground(Color.WHITE);
         btnaddHD.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("add.png"));
+        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/add.png"));
         Image image_add = add_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         add_icon.setImage(image_add);
         btnaddHD.setIcon(new NoScalingIcon(add_icon));
@@ -337,7 +337,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         btneditHD.setOpaque(true);
         btneditHD.setForeground(Color.WHITE);
         btneditHD.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("edit.png"));
+        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/edit.png"));
         Image image_edit = edit_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         edit_icon.setImage(image_edit);
         btneditHD.setIcon(new NoScalingIcon(edit_icon));
@@ -350,7 +350,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         btnremoveHD.setOpaque(true);
         btnremoveHD.setForeground(Color.WHITE);
         btnremoveHD.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("remove.png"));
+        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/remove.png"));
         Image image_remove = remove_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         remove_icon.setImage(image_remove);
         btnremoveHD.setIcon(new NoScalingIcon(remove_icon));
@@ -362,7 +362,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         btnresetHD.setOpaque(true);
         btnresetHD.setForeground(Color.WHITE);
         btnresetHD.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
+        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/reset.png"));
         Image image_reset = reset_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         reset_icon.setImage(image_reset);
         btnresetHD.setIcon(new NoScalingIcon(reset_icon));
@@ -374,7 +374,7 @@ public class JPanelHoaDon extends JPanel implements KeyListener, MouseListener {
         btnsaveHD.setOpaque(true);
         btnsaveHD.setForeground(Color.WHITE);
         btnsaveHD.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon save_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
+        ImageIcon save_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/reset.png"));
         Image image_save = save_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         save_icon.setImage(image_save);
         btnsaveHD.setIcon(new NoScalingIcon(save_icon));

@@ -193,9 +193,3 @@ public class EditHoaDon extends JFrame implements ActionListener, KeyListener {
     }
 }
 
-class TEST_EDIT_HD {
-    public static void main(String[] args) {
-        new EditHoaDon("1000", "Xi Măng", "64800", "Xuất", "9000", "363636", "2");
-    }
-}
-

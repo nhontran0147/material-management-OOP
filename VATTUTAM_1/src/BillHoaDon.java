@@ -66,7 +66,7 @@ public class BillHoaDon extends JDialog implements ActionListener, KeyListener {
         JLBTop.setForeground(Color.WHITE);
         JPmain.add(JLBTop);
 
-        ImageIcon money_icon = new ImageIcon(BillHoaDon.class.getResource("money.png"));
+        ImageIcon money_icon = new ImageIcon(BillHoaDon.class.getResource("Image/money.png"));
         Image image_money = money_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         money_icon.setImage(image_money);
         JLBCanThanhToan = new JLabel("TIỀN HÀNG: " + ChuanHoa.ChuyenSoThanhTien(tongTien) + "đ");
@@ -245,6 +245,7 @@ public class BillHoaDon extends JDialog implements ActionListener, KeyListener {
             JPanelHoaDon.reSetALL();
             JPanelVatTu.reSetAll();
             JPanelNhanVien.reSetAll();
+            JPanelVatTu.setDanglapHD_VT(false);
             this.dispose();
             }
         }

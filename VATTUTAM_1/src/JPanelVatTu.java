@@ -159,7 +159,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btnaddVT.setOpaque(true);
         btnaddVT.setForeground(Color.WHITE);
         btnaddVT.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("add.png"));
+        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/add.png"));
         Image image_add = add_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         add_icon.setImage(image_add);
         btnaddVT.setIcon(new NoScalingIcon(add_icon));
@@ -171,7 +171,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btneditVT.setOpaque(true);
         btneditVT.setForeground(Color.WHITE);
         btneditVT.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("edit.png"));
+        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/edit.png"));
         Image image_edit = edit_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         edit_icon.setImage(image_edit);
         btneditVT.setIcon(new NoScalingIcon(edit_icon));
@@ -184,7 +184,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btnremoveVT.setOpaque(true);
         btnremoveVT.setForeground(Color.WHITE);
         btnremoveVT.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("remove.png"));
+        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/remove.png"));
         Image image_remove = remove_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         remove_icon.setImage(image_remove);
         btnremoveVT.setIcon(new NoScalingIcon(remove_icon));
@@ -196,7 +196,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         btnresetVT.setOpaque(true);
         btnresetVT.setForeground(Color.WHITE);
         btnresetVT.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
+        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/reset.png"));
         Image image_reset = reset_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         reset_icon.setImage(image_reset);
         btnresetVT.setIcon(new NoScalingIcon(reset_icon));
@@ -461,7 +461,7 @@ public class JPanelVatTu extends JPanel implements KeyListener, MouseListener {
         maVTValueSelected = null;
         upDateList();
     }
-    public static void main(String[] args){
-        JPanelVatTu t= new JPanelVatTu();
-    }
+//    public static void main(String[] args){
+//        JPanelVatTu t= new JPanelVatTu();
+//    }
 }

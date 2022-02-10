@@ -46,7 +46,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         this.setBackground(new Color(255, 255, 255));
         this.setLayout(null);
         inkieu=-1;
-        ImageIcon iconVT = new ImageIcon(JPanelThongKe.class.getResource("book.png"));
+        ImageIcon iconVT = new ImageIcon(JPanelThongKe.class.getResource("Image/book.png"));
         Image img_one = iconVT.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         lbTKVatTu = new JLabel("Vật Tư");
         lbTKVatTu.setHorizontalAlignment(JLabel.CENTER);
@@ -72,7 +72,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         boxVatTu.add(lbSLVatTu);
 
 
-        ImageIcon iconNV = new ImageIcon(JPanelThongKe.class.getResource("book.png"));
+        ImageIcon iconNV = new ImageIcon(JPanelThongKe.class.getResource("Image/book.png"));
         Image img_two = iconNV.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         lbTKNhanVien = new JLabel("Nhân Viên");
         lbTKNhanVien.setHorizontalAlignment(JLabel.CENTER);
@@ -98,7 +98,7 @@ public class JPanelThongKe extends JPanel implements ActionListener {
         boxNhanVien.add(lbSLNhanVien);
 
 
-        ImageIcon iconHD = new ImageIcon(JPanelThongKe.class.getResource("book.png"));
+        ImageIcon iconHD = new ImageIcon(JPanelThongKe.class.getResource("Image/book.png"));
         Image img_three = iconNV.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         lbTKHoaDon = new JLabel("Hóa Đơn");
         lbTKHoaDon.setHorizontalAlignment(JLabel.CENTER);

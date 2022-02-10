@@ -2,10 +2,6 @@ import java.util.Arrays;
 import java.util.Locale;
 
 public class ChuanHoa {
-    public static void main(String[] args) {
-        String s = "   z  ";
-        System.out.println(ChuanHoa(s));
-    }
 
     public static String ChuanHoa(String s) {
         s = s.trim();

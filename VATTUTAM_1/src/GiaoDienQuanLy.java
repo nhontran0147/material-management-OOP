@@ -54,7 +54,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb001.setBounds(20, 20, 210, 100);
         lb001.setBackground(new Color(255, 209, 30));
         lb001.setOpaque(true);
-        ImageIcon icon00 = new ImageIcon(GiaoDienQuanLy.class.getResource("man.png"));
+        ImageIcon icon00 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/man.png"));
         Image newimg00 = icon00.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         lb001.setHorizontalAlignment(JLabel.CENTER);
         lb001.setHorizontalTextPosition(JLabel.CENTER);
@@ -90,7 +90,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb01.setHorizontalAlignment(SwingConstants.CENTER);
         lb01.setForeground(Color.WHITE);
 
-        ImageIcon icon01 = new ImageIcon(GiaoDienQuanLy.class.getResource("material.png"));
+        ImageIcon icon01 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/material.png"));
         Image newimg01 = icon01.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
         icon01.setImage(newimg01);
         lb01.setIcon(new NoScalingIcon(icon01));
@@ -108,7 +108,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb02.setHorizontalAlignment(SwingConstants.CENTER);
         lb02.setForeground(Color.WHITE);
 
-        ImageIcon icon02 = new ImageIcon(GiaoDienQuanLy.class.getResource("student.png"));
+        ImageIcon icon02 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/student.png"));
         Image newimg02 = icon02.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         icon02.setImage(newimg02);
         lb02.setIcon(new NoScalingIcon(icon02));
@@ -126,7 +126,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             lb03.setHorizontalAlignment(SwingConstants.CENTER);
             lb03.setForeground(Color.WHITE);
 
-            ImageIcon icon03 = new ImageIcon(GiaoDienQuanLy.class.getResource("invoice.png"));
+            ImageIcon icon03 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/invoice.png"));
             Image newimg03 = icon03.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
             icon03.setImage(newimg03);
             lb03.setIcon(new NoScalingIcon(icon03));
@@ -152,7 +152,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
         lb031.setHorizontalAlignment(SwingConstants.CENTER);
         lb031.setForeground(Color.WHITE);
 
-        ImageIcon icon04 = new ImageIcon(GiaoDienQuanLy.class.getResource("overview.png"));
+        ImageIcon icon04 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/overview.png"));
         Image newimg04 = icon04.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         icon04.setImage(newimg04);
         lb031.setIcon(new NoScalingIcon(icon04));
@@ -168,7 +168,7 @@ public class GiaoDienQuanLy extends JFrame implements MouseListener {
             lb032.setHorizontalAlignment(SwingConstants.CENTER);
             lb032.setForeground(Color.WHITE);
 
-            ImageIcon icon05 = new ImageIcon(GiaoDienQuanLy.class.getResource("signup.png"));
+            ImageIcon icon05 = new ImageIcon(GiaoDienQuanLy.class.getResource("Image/signup.png"));
             Image newimg05 = icon05.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
             icon05.setImage(newimg05);
             lb032.setIcon(new NoScalingIcon(icon05));

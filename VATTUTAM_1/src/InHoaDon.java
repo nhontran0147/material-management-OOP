@@ -204,28 +204,28 @@ public class InHoaDon extends JFrame{
     }
 }
 
-class MainPrint{
-    public static void main(String[] args) {
-        InHoaDon A = new InHoaDon();
-//        MessageFormat header = new MessageFormat("Page {0,number,integer}");
-//        MessageFormat footer = new MessageFormat("Page {0,number,integer}");
-//        try {
-//            InHoaDon.getTbhoadon().print(JTable.PrintMode.NORMAL, header, footer);
-//        } catch (PrinterException e) {
-//            e.printStackTrace();
-//        }
-//        A.PRINTHOADON();
-
-
-            for (int i = 0; i < InHoaDon.getTbhoadon().getRowCount(); i++) {  // Loop through the rows
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 0));
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 1));
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 2));
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 3));
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 4));
-                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 5));
-
-            }
-    }
-}
-
+//class MainPrint{
+//    public static void main(String[] args) {
+//        InHoaDon A = new InHoaDon();
+////        MessageFormat header = new MessageFormat("Page {0,number,integer}");
+////        MessageFormat footer = new MessageFormat("Page {0,number,integer}");
+////        try {
+////            InHoaDon.getTbhoadon().print(JTable.PrintMode.NORMAL, header, footer);
+////        } catch (PrinterException e) {
+////            e.printStackTrace();
+////        }
+////        A.PRINTHOADON();
+//
+//
+//            for (int i = 0; i < InHoaDon.getTbhoadon().getRowCount(); i++) {  // Loop through the rows
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 0));
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 1));
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 2));
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 3));
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 4));
+//                System.out.println(InHoaDon.getTbhoadon().getValueAt(i, 5));
+//
+//            }
+//    }
+//}
+//

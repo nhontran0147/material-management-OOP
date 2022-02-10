@@ -116,7 +116,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btnaddNV.setOpaque(true);
         btnaddNV.setForeground(Color.WHITE);
         btnaddNV.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("add.png"));
+        ImageIcon add_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/add.png"));
         Image image_add = add_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         add_icon.setImage(image_add);
         btnaddNV.setIcon(new NoScalingIcon(add_icon));
@@ -128,7 +128,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btneditNV.setOpaque(true);
         btneditNV.setForeground(Color.WHITE);
         btneditNV.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("edit.png"));
+        ImageIcon edit_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/edit.png"));
         Image image_edit = edit_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         edit_icon.setImage(image_edit);
         btneditNV.setIcon(new NoScalingIcon(edit_icon));
@@ -141,7 +141,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btnremoveNV.setOpaque(true);
         btnremoveNV.setForeground(Color.WHITE);
         btnremoveNV.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("remove.png"));
+        ImageIcon remove_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/remove.png"));
         Image image_remove = remove_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         remove_icon.setImage(image_remove);
         btnremoveNV.setIcon(new NoScalingIcon(remove_icon));
@@ -153,7 +153,7 @@ public class JPanelNhanVien extends JPanel implements MouseListener, KeyListener
         btnresetNV.setOpaque(true);
         btnresetNV.setForeground(Color.WHITE);
         btnresetNV.setHorizontalAlignment(SwingConstants.CENTER);
-        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("reset.png"));
+        ImageIcon reset_icon = new ImageIcon(JPanelVatTu.class.getResource("Image/reset.png"));
         Image image_reset = reset_icon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
         reset_icon.setImage(image_reset);
         btnresetNV.setIcon(new NoScalingIcon(reset_icon));
