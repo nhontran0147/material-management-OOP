@@ -101,9 +101,23 @@ Sau khi đã tải folder dưới dạng zip về máy, thì ta giải nén. M�
 
 Lúc đó ta chọn đúng folder tên là material-management-project-OOP-main
 
-Ấn OK và chờ cho đến khi việc thiết lập project hoàn tất. Sau khi đã thiết lập hoàn tất thì ta sẽ vào VATTUTAM_1 -> src -> ConnectSQL, sau đó kéo xuống dòng thứ 12 sửa password theo tài khoản sa tương ứng đã đặt.
+Ấn OK và chờ cho đến khi việc thiết lập project hoàn tất. Sau khi đã thiết lập hoàn tất thì ta sẽ vào material-management-project-OOP-main -> VATTUTAM_1 -> src -> ConnectSQL, sau đó kéo xuống dòng thứ 12 sửa password theo tài khoản sa tương ứng đã đặt.
 
 ![](Image_git/h27.png)
+
+Ta cần tải thêm JDBC Driver (https://docs.microsoft.com/vi-vn/sql/connect/jdbc/release-notes-for-the-jdbc-driver?view=sql-server-2017#92) và chọn bản 9.2 sau đó giải nén.
+
+![](Image_git/h23.png)
+
+Sau đó tiếp tục tải jcalendar-1.4 (http://www.java2s.com/Code/Jar/j/Downloadjcalendar14jar.htm) sau đó giải nén.
+
+![](Image_git/h24.png)
+
+Các công việc kế tiếp lần lượt là vào File -> Project Structure -> Project -> chọn SDK phù hợp (ở đây ta dùng version 15.0.2) -> Modules -> Modules SDK (version 15.0.2) -> Export lần lượt hai file .jar như trong hình mà ta đã tải và giải nén ở trên. Sau đó Apply và chọn OK.
+
+![](Image_git/h25.png)
+
+![](Image_git/h26.png)
 
 Sau khi đã chỉnh xong ta sẽ chuyển qua file java Login và Run 'Login.main()'.
 
